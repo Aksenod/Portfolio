@@ -34,7 +34,8 @@ def _parse_origins(value: str) -> list[str]:
 
 
 def _get_database_url() -> str:
-    url = os.getenv("DATABASE_URL") or "sqlite:///./app.db"
+    # Force SQLite for Python 3.13 compatibility
+    url = "sqlite:///./app.db"
     # Render Postgres often uses postgres:// which SQLAlchemy expects as postgresql://
     if url.startswith("postgres://"):
         url = url.replace("postgres://", "postgresql://", 1)
