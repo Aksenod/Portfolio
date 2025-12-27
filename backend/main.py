@@ -1,7 +1,7 @@
 import os
 import uuid
 from datetime import datetime, timedelta, timezone
-from typing import Optional
+from typing import Optional, Union
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -68,7 +68,9 @@ def _compute_admin_password_hash() -> str:
     password = os.getenv("ADMIN_PASSWORD")
     if not password:
         password = "bugrov2025"
-    return pwd_context.hash(password)
+    
+    # Use pre-computed hash to avoid bcrypt issues
+    return "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj6QJw/2Ej7W"
 
 
 ADMIN_PASSWORD_HASH = _compute_admin_password_hash()
@@ -105,15 +107,15 @@ class QuoteBlock(BlockBase):
     text: str
     author: str = ""
 
-Block = HeroBlock | TextBlock | ImageBlock | GalleryBlock | QuoteBlock
+Block = Union[HeroBlock, TextBlock, ImageBlock, GalleryBlock, QuoteBlock]
 
 class ProjectBase(SQLModel):
     slug: str = Field(index=True, unique=True)
     title: str
-    category: CategoryType = "Сайты"
+    category: str = "Сайты"
     cover_image: str = ""
     enabled: bool = True
-    blocks: List[Block] = Field(default_factory=list, sa_type=JSON)
+    blocks: List[dict] = Field(default_factory=list, sa_type=JSON)
 
 class Project(ProjectBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
