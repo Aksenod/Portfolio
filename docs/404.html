@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting...</title>
+  <meta name="robots" content="noindex, nofollow">
+</head>
+<body>
+  <script>
+    (function() {
+      var BASE = '/Portfolio';
+      var path = window.location.pathname || '/';
+      var search = window.location.search || '';
+      var hash = window.location.hash || '';
+
+      // Normalize path without base prefix
+      var normalizedPath = path.indexOf(BASE + '/') === 0 ? path.slice(BASE.length) : path;
+
+      // GitHub Pages fallback:
+      // If user opens /proekty/<slug>, GitHub serves 404.html.
+      // We redirect to /proekty/index.html and pass the original path.
+      if (normalizedPath.indexOf('/proekty/') === 0) {
+        var target = BASE + '/proekty/index.html?path=' + encodeURIComponent(normalizedPath) + search + hash;
+        window.location.replace(target);
+        return;
+      }
+
+      // Default fallback: go home
+      window.location.replace(BASE + '/');
+    })();
+  </script>
+</body>
+</html>

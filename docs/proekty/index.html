@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Загрузка проекта...</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link href="/Portfolio/assets/62797855494abeff5a9f1db0/css/bugrov.webflow.31de432ed.css" rel="stylesheet" type="text/css">
+  <style>
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #666;
+    }
+    .error {
+      text-align: center;
+      padding: 60px 20px;
+      color: #666;
+    }
+    .error h1 {
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+    .error a {
+      color: #007bff;
+      text-decoration: none;
+    }
+    .error a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="loading">Загрузка проекта...</div>
+  </div>
+
+  <script src="/Portfolio/api-config.js"></script>
+  <script>
+    const API_BASE = window.__API_BASE || 'https://your-backend-url.onrender.com';
+
+    function getSlug() {
+      // Normal case: /proekty/<slug>
+      const pathParts = window.location.pathname.split('/').filter(Boolean);
+      const last = pathParts[pathParts.length - 1];
+      if (last && last !== 'index.html') return last;
+
+      // GitHub Pages 404.html fallback: /proekty/index.html?path=/proekty/<slug>
+      try {
+        const params = new URLSearchParams(window.location.search || '');
+        const originalPath = params.get('path');
+        if (originalPath) {
+          const originalParts = originalPath.split('/').filter(Boolean);
+          const originalLast = originalParts[originalParts.length - 1];
+          if (originalLast && originalLast !== 'index.html') return originalLast;
+        }
+      } catch (e) {
+        // ignore
+      }
+
+      return '';
+    }
+
+    const slug = getSlug();
+
+    async function loadProject() {
+      try {
+        const response = await fetch(`${API_BASE}/projects/${slug}`);
+        if (!response.ok) {
+          if (response.status === 404) {
+            showError('Проект не найден', 'Возможно, он был удален или еще не опубликован.');
+          } else {
+            showError('Ошибка загрузки', 'Не удалось загрузить данные проекта. Попробуйте обновить страницу.');
+          }
+          return;
+        }
+
+        const project = await response.json();
+        renderProject(project);
+      } catch (error) {
+        console.error('Failed to load project:', error);
+        showError('Ошибка соединения', 'Проверьте подключение к интернету и попробуйте снова.');
+      }
+    }
+
+    function showError(title, message) {
+      document.getElementById('app').innerHTML = `
+        <div class="error">
+          <h1>${title}</h1>
+          <p>${message}</p>
+          <p><a href="/Portfolio/cases">← Вернуться к кейсам</a></p>
+        </div>
+      `;
+    }
+
+    function renderProject(project) {
+      // Update page title and meta
+      document.title = `${project.title} — Bugrov.space`;
+      
+      // Find meta description and update it
+      let metaDesc = document.querySelector('meta[name="description"]');
+      if (!metaDesc) {
+        metaDesc = document.createElement('meta');
+        metaDesc.name = 'description';
+        document.head.appendChild(metaDesc);
+      }
+      metaDesc.content = project.blocks.find(b => b.type === 'hero')?.subtitle || '';
+
+      // Update og:image if cover exists
+      if (project.cover_image) {
+        let metaImage = document.querySelector('meta[property="og:image"]');
+        if (!metaImage) {
+          metaImage = document.createElement('meta');
+          metaImage.property = 'og:image';
+          document.head.appendChild(metaImage);
+        }
+        metaImage.content = project.cover_image;
+      }
+
+      // Render project content
+      const content = renderBlocks(project.blocks);
+      document.getElementById('app').innerHTML = content;
+    }
+
+    function renderBlocks(blocks) {
+      return blocks.map(block => {
+        switch (block.type) {
+          case 'hero':
+            return renderHeroBlock(block);
+          case 'text':
+            return renderTextBlock(block);
+          case 'image':
+            return renderImageBlock(block);
+          case 'gallery':
+            return renderGalleryBlock(block);
+          case 'quote':
+            return renderQuoteBlock(block);
+          default:
+            return '';
+        }
+      }).join('');
+    }
+
+    function renderHeroBlock(block) {
+      return `
+        <section class="section-new hero-section">
+          <div class="container-new">
+            <div class="projects-hh-wrap">
+              <h1 class="h1-new project-h1">${escapeHtml(block.title)}</h1>
+              <div class="project-hero-buttons">
+                <a href="javascript:history.back(-1)" class="round-button w-inline-block">
+                  <div class="_24-button-arrow">
+                    <div class="svg w-embed">
+                      <svg width="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 14L4 9L9 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M20 20V13C20 11.9391 19.5786 10.9217 18.8284 10.1716C18.0783 9.42143 17.0609 9 16 9H4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </div>
+            ${block.subtitle ? `<div class="content-block mt-100"><div class="text-45px">${escapeHtml(block.subtitle)}</div></div>` : ''}
+            ${block.coverImage ? `
+              <div class="content-block mt-100">
+                <div class="image-wrap">
+                  <div class="image-wrapper">
+                    <img src="${escapeHtml(block.coverImage)}" loading="lazy" alt="" class="image-contain"/>
+                    <div class="image-owerlay"></div>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        </section>
+      `;
+    }
+
+    function renderTextBlock(block) {
+      // Simple markdown to HTML conversion (basic)
+      let html = block.markdown
+        .replace(/^### (.*$)/gim, '<h3 class="heading-3">$1</h3>')
+        .replace(/^## (.*$)/gim, '<h2 class="heading-2">$1</h2>')
+        .replace(/^# (.*$)/gim, '<h1 class="heading-1">$1</h1>')
+        .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
+        .replace(/\*(.*)\*/gim, '<em>$1</em>')
+        .replace(/\n/g, '<br>');
+
+      return `
+        <section class="section-new">
+          <div class="container-new">
+            <div class="content-block mt-100">
+              <div class="text-45px">${html}</div>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderImageBlock(block) {
+      return `
+        <section class="section-new">
+          <div class="container-new">
+            <div class="content-block mt-100">
+              <div class="image-wrap">
+                <div class="image-wrapper">
+                  <img src="${escapeHtml(block.src)}" loading="lazy" alt="${escapeHtml(block.alt)}" class="image-contain"/>
+                  <div class="image-owerlay"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderGalleryBlock(block) {
+      const images = block.images.map(img => `
+        <div class="image-wrapper">
+          <img src="${escapeHtml(img.src)}" loading="lazy" alt="${escapeHtml(img.alt)}" class="image-contain"/>
+          <div class="image-owerlay"></div>
+        </div>
+      `).join('');
+
+      return `
+        <section class="section-new">
+          <div class="container-new">
+            <div class="content-block mt-100">
+              <div class="_4-col-grid">
+                ${images}
+              </div>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderQuoteBlock(block) {
+      return `
+        <section class="section-new">
+          <div class="container-new">
+            <div class="content-block mt-100">
+              <blockquote class="quote-block">
+                <div class="quote-text">"${escapeHtml(block.text)}"</div>
+                ${block.author ? `<div class="quote-author">— ${escapeHtml(block.author)}</div>` : ''}
+              </blockquote>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Load project on page load
+    if (slug) {
+      loadProject();
+    } else {
+      showError('Ошибка URL', 'Не указан slug проекта.');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Bugrov.space</title>
+  <meta name="robots" content="noindex, nofollow">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      min-height: 100vh;
+    }
+    
+    /* Login Screen */
+    .login-screen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .login-box {
+      background: #1a1a1a;
+      padding: 40px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 400px;
+      border: 1px solid #333;
+    }
+    
+    .login-box h1 {
+      font-size: 24px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    
+    .login-box p {
+      color: #888;
+      margin-bottom: 32px;
+      font-size: 14px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #ccc;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 12px 16px;
+      background: #0a0a0a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 16px;
+      transition: border-color 0.2s;
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: #fff;
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: #fff;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    
+    .btn:hover {
+      opacity: 0.9;
+    }
+    
+    .error-msg {
+      color: #ff4444;
+      font-size: 14px;
+      margin-top: 16px;
+      display: none;
+    }
+    
+    /* Admin Panel */
+    .admin-panel {
+      display: none;
+      min-height: 100vh;
+    }
+    
+    .admin-header {
+      background: #1a1a1a;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #333;
+    }
+    
+    .admin-header h1 {
+      font-size: 20px;
+      font-weight: 600;
+    }
+    
+    .logout-btn {
+      padding: 10px 20px;
+      background: transparent;
+      color: #888;
+      border: 1px solid #333;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    
+    .logout-btn:hover {
+      color: #fff;
+      border-color: #fff;
+    }
+    
+    .admin-content {
+      padding: 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    
+    .section-header h2 {
+      font-size: 24px;
+      font-weight: 600;
+    }
+    
+    .add-btn {
+      padding: 12px 24px;
+      background: #fff;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: opacity 0.2s;
+    }
+    
+    .add-btn:hover {
+      opacity: 0.9;
+    }
+    
+    /* Cases List */
+    .cases-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .case-item {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      transition: border-color 0.2s;
+      cursor: pointer;
+    }
+    
+    .case-item:hover {
+      border-color: #555;
+    }
+    
+    .case-item.disabled {
+      opacity: 0.5;
+    }
+    
+    .case-thumb {
+      width: 80px;
+      height: 60px;
+      background: #333;
+      border-radius: 6px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    
+    .case-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .case-info {
+      flex: 1;
+    }
+    
+    .case-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .case-category {
+      font-size: 14px;
+      color: #888;
+    }
+    
+    .case-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .case-actions,
+    .case-actions * {
+      cursor: default;
+    }
+    
+    /* Toggle Switch */
+    .toggle {
+      position: relative;
+      width: 48px;
+      height: 26px;
+    }
+    
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #333;
+      transition: 0.3s;
+      border-radius: 26px;
+    }
+    
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #888;
+      transition: 0.3s;
+      border-radius: 50%;
+    }
+    
+    .toggle input:checked + .toggle-slider {
+      background-color: #4ade80;
+    }
+    
+    .toggle input:checked + .toggle-slider:before {
+      transform: translateX(22px);
+      background-color: #fff;
+    }
+    
+    .action-btn {
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid #333;
+      border-radius: 6px;
+      color: #888;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .action-btn:hover {
+      color: #fff;
+      border-color: #555;
+    }
+    
+    .action-btn.delete:hover {
+      color: #ff4444;
+      border-color: #ff4444;
+    }
+    
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 1000;
+    }
+    
+    .modal {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 32px;
+      width: 100%;
+      max-width: 500px;
+    }
+    
+    .modal h2 {
+      font-size: 20px;
+      margin-bottom: 24px;
+    }
+    
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    
+    .modal-actions .btn {
+      flex: 1;
+    }
+    
+    .btn-secondary {
+      background: transparent;
+      color: #888;
+      border: 1px solid #333;
+    }
+    
+    .btn-secondary:hover {
+      color: #fff;
+      border-color: #555;
+    }
+    
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #888;
+    }
+    
+    .empty-state p {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Login Screen -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-box">
+      <h1>Bugrov.space</h1>
+      <p>Войдите в админ-панель</p>
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="username">Логин</label>
+          <input type="text" id="username" name="username" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label for="password">Пароль</label>
+          <input type="password" id="password" name="password" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn">Войти</button>
+        <p class="error-msg" id="errorMsg">Неверный логин или пароль</p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Panel -->
+  <div class="admin-panel" id="adminPanel">
+    <header class="admin-header">
+      <h1>Управление проектами</h1>
+      <button class="logout-btn" id="logoutBtn">Выйти</button>
+    </header>
+    <main class="admin-content">
+      <div class="admin-actions">
+        <button class="add-btn" id="addCaseBtn">Добавить проект</button>
+      </div>
+      <div class="cases-list" id="casesList">
+        <!-- Projects will be rendered here -->
+      </div>
+    </main>
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal-overlay" id="caseModal">
+    <div class="modal">
+      <h2 id="modalTitle">Редактировать проект</h2>
+      <form id="projectForm">
+        <div class="form-group">
+          <label for="projectSlug">Slug (URL)</label>
+          <input type="text" id="projectSlug" name="slug" required placeholder="miroko">
+        </div>
+        <div class="form-group">
+          <label for="projectTitle">Название</label>
+          <input type="text" id="projectTitle" name="title" required placeholder="МИРОко">
+        </div>
+        <div class="form-group">
+          <label for="projectCategory">Категория</label>
+          <select id="projectCategory" name="category">
+            <option value="Сайты">Сайты</option>
+            <option value="Презентации">Презентации</option>
+            <option value="Брендинг">Брендинг</option>
+            <option value="Аудит">Аудит</option>
+            <option value="Рекомендации">Рекомендации</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="projectCoverImage">Обложка</label>
+          <input type="text" id="projectCoverImage" name="cover_image" placeholder="/assets/...">
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="projectEnabled" name="enabled" checked>
+            Включен
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="projectBlocks">Блоки (JSON)</label>
+          <textarea id="projectBlocks" name="blocks" rows="10" placeholder='[{"type": "hero", "title": "", "subtitle": "", "coverImage": ""}]'></textarea>
+        </div>
+        <input type="hidden" id="projectId" name="id">
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="cancelBtn">Отмена</button>
+          <button type="submit" class="btn">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/Portfolio/api-config.js"></script>
+  <script>
+    // API Configuration
+    const API_BASE = window.__API_BASE || 'https://your-backend-url.onrender.com';
+
+    let authToken = localStorage.getItem('adminToken');
+    let projects = [];
+
+    // API helpers
+    async function apiRequest(endpoint, options = {}) {
+      const url = `${API_BASE}${endpoint}`;
+      const headers = {
+        'Content-Type': 'application/json',
+        ...(authToken && { Authorization: `Bearer ${authToken}` }),
+        ...options.headers,
+      };
+      
+      const response = await fetch(url, { ...options, headers });
+      if (response.status === 401) {
+        localStorage.removeItem('adminToken');
+        authToken = null;
+        showLoginScreen();
+        throw new Error('Unauthorized');
+      }
+      
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ detail: 'Request failed' }));
+        throw new Error(error.detail || 'Request failed');
+      }
+      
+      return response.json();
+    }
+
+    // Auth functions
+    async function login(username, password) {
+      try {
+        const data = await apiRequest('/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({ username, password }),
+        });
+        authToken = data.access_token;
+        localStorage.setItem('adminToken', authToken);
+        return true;
+      } catch (error) {
+        console.error('Login failed:', error);
+        return false;
+      }
+    }
+
+    async function loadProjects() {
+      try {
+        projects = await apiRequest('/admin/projects');
+        renderProjects();
+      } catch (error) {
+        console.error('Failed to load projects:', error);
+        projects = [];
+        renderProjects();
+      }
+    }
+
+    async function createProject(projectData) {
+      try {
+        const project = await apiRequest('/admin/projects', {
+          method: 'POST',
+          body: JSON.stringify(projectData),
+        });
+        projects.unshift(project);
+        renderProjects();
+        return project;
+      } catch (error) {
+        console.error('Failed to create project:', error);
+        throw error;
+      }
+    }
+
+    async function updateProject(id, projectData) {
+      try {
+        const project = await apiRequest(`/admin/projects/${id}`, {
+          method: 'PATCH',
+          body: JSON.stringify(projectData),
+        });
+        const index = projects.findIndex(p => p.id === id);
+        if (index !== -1) {
+          projects[index] = project;
+          renderProjects();
+        }
+        return project;
+      } catch (error) {
+        console.error('Failed to update project:', error);
+        throw error;
+      }
+    }
+
+    async function deleteProject(id) {
+      try {
+        await apiRequest(`/admin/projects/${id}`, { method: 'DELETE' });
+        projects = projects.filter(p => p.id !== id);
+        renderProjects();
+      } catch (error) {
+        console.error('Failed to delete project:', error);
+        throw error;
+      }
+    }
+
+    // DOM Elements
+    const loginScreen = document.getElementById('loginScreen');
+    const adminPanel = document.getElementById('adminPanel');
+    const loginForm = document.getElementById('loginForm');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const casesList = document.getElementById('casesList');
+    const addCaseBtn = document.getElementById('addCaseBtn');
+    const projectModal = document.getElementById('caseModal');
+    const projectForm = document.getElementById('projectForm');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const modalTitle = document.getElementById('modalTitle');
+    const errorMsg = document.getElementById('errorMsg');
+
+    // Event Listeners
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      
+      const success = await login(username, password);
+      if (success) {
+        errorMsg.style.display = 'none';
+        showAdminPanel();
+        await loadProjects();
+      } else {
+        errorMsg.style.display = 'block';
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('adminToken');
+      authToken = null;
+      showLoginScreen();
+    });
+
+    addCaseBtn.addEventListener('click', () => {
+      openAddModal();
+    });
+
+    cancelBtn.addEventListener('click', () => {
+      closeModal();
+    });
+
+    projectForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const projectData = {
+        slug: document.getElementById('projectSlug').value,
+        title: document.getElementById('projectTitle').value,
+        category: document.getElementById('projectCategory').value,
+        cover_image: document.getElementById('projectCoverImage').value,
+        enabled: document.getElementById('projectEnabled').checked,
+      };
+
+      // Parse and validate blocks JSON
+      let blocks;
+      try {
+        blocks = JSON.parse(document.getElementById('projectBlocks').value);
+        if (!Array.isArray(blocks)) {
+          throw new Error('Blocks must be an array');
+        }
+        projectData.blocks = blocks;
+      } catch (error) {
+        alert('Ошибка в JSON блоков: ' + error.message);
+        return;
+      }
+
+      try {
+        if (editingId) {
+          await updateProject(editingId, projectData);
+        } else {
+          await createProject(projectData);
+        }
+        closeModal();
+      } catch (error) {
+        alert('Не удалось сохранить проект: ' + error.message);
+      }
+    });
+
+    casesList.addEventListener('click', (e) => {
+      const item = e.target.closest('.case-item');
+      if (!item) return;
+      if (e.target.closest('.case-actions')) return;
+      const id = item.getAttribute('data-id');
+      if (!id) return;
+      editProject(id);
+    });
+
+    // Check auth on load
+    if (authToken) {
+      showAdminPanel();
+      loadProjects();
+    } else {
+      showLoginScreen();
+    }
+
+    // Show admin panel
+    function showAdminPanel() {
+      loginScreen.style.display = 'none';
+      adminPanel.style.display = 'block';
+    }
+
+    // Show login screen
+    function showLoginScreen() {
+      loginScreen.style.display = 'flex';
+      adminPanel.style.display = 'none';
+    }
+
+    // Close modal
+    function closeModal() {
+      projectModal.style.display = 'none';
+      editingId = null;
+    }
+
+    // Render projects list
+    function renderProjects() {
+      if (projects.length === 0) {
+        casesList.innerHTML = `
+          <div class="empty-state">
+            <p>Проектов пока нет</p>
+            <button class="add-btn" onclick="openAddModal()">Добавить первый проект</button>
+          </div>
+        `;
+        return;
+      }
+
+      casesList.innerHTML = projects.map(p => `
+        <div class="case-item ${p.enabled ? '' : 'disabled'}" data-id="${p.id}">
+          <div class="case-thumb">
+            <img src="${p.cover_image}" alt="${p.title}" onerror="this.style.display='none'">
+          </div>
+          <div class="case-info">
+            <div class="case-title">${p.title}</div>
+            <div class="case-category">${p.category}</div>
+            <div class="case-slug">/${p.slug}</div>
+          </div>
+          <div class="case-actions">
+            <label class="toggle">
+              <input type="checkbox" ${p.enabled ? 'checked' : ''} onchange="toggleProject('${p.id}')">
+              <span class="toggle-slider"></span>
+            </label>
+            <button class="action-btn" onclick="editProject('${p.id}')">Редактировать</button>
+            <button class="action-btn delete" onclick="deleteProjectConfirm('${p.id}')">Удалить</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Toggle project enabled/disabled
+    async function toggleProject(id) {
+      const project = projects.find(p => p.id === id);
+      if (project) {
+        try {
+          await updateProject(id, { enabled: !project.enabled });
+        } catch (error) {
+          alert('Не удалось обновить статус проекта');
+        }
+      }
+    }
+
+    // Delete project
+    async function deleteProjectConfirm(id) {
+      if (confirm('Удалить этот проект?')) {
+        try {
+          await deleteProject(id);
+        } catch (error) {
+          alert('Не удалось удалить проект');
+        }
+      }
+    }
+
+    // Open add modal
+    function openAddModal() {
+      editingId = null;
+      modalTitle.textContent = 'Добавить проект';
+      projectForm.reset();
+      document.getElementById('projectId').value = '';
+      document.getElementById('projectBlocks').value = JSON.stringify([
+        { type: 'hero', title: '', subtitle: '', coverImage: '' },
+        { type: 'text', markdown: '' }
+      ], null, 2);
+      projectModal.style.display = 'flex';
+    }
+
+    // Edit project
+    function editProject(id) {
+      const project = projects.find(p => p.id === id);
+      if (project) {
+        editingId = id;
+        modalTitle.textContent = 'Редактировать проект';
+        document.getElementById('projectSlug').value = project.slug;
+        document.getElementById('projectTitle').value = project.title;
+        document.getElementById('projectCategory').value = project.category;
+        document.getElementById('projectCoverImage').value = project.cover_image;
+        document.getElementById('projectEnabled').checked = project.enabled;
+        document.getElementById('projectBlocks').value = JSON.stringify(project.blocks, null, 2);
+        document.getElementById('projectId').value = id;
+        projectModal.style.display = 'flex';
+      }
+    }
+  </script>
+</body>
+</html>

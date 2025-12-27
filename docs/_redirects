@@ -1,0 +1,5 @@
+# Rewrites for Render Static Site
+# This file tells Render to redirect all /proekty/* requests to /proekty/index.html
+# The JavaScript in index.html will then read the slug from the URL and fetch the project data
+
+/proekty/* /proekty/index.html 200
