@@ -2617,7 +2617,7 @@ figcaption {
 }
 
 .page-padding.image-bg {
-  background-image: linear-gradient(rgba(0, 0, 0, .5), rgba(0, 0, 0, .5)), url(/Portfolio/assets/external/cdn.prod.website-files.com/62797855494abeff5a9f1db0/627994439714467b34e36fe2_Ocxlr7QAAB3vh2ZWl3kAxWx_Tlswthn9tBk1YTnnI0j-9EJpxKHU-PB_9Ur9ud3EkOpFPo8ObN0qQd1_x2MNV5uR.jpg");
+  background-image: linear-gradient(rgba(0, 0, 0, .5), rgba(0, 0, 0, .5)), url(/Portfolio/assets/external/cdn.prod.website-files.com/62797855494abeff5a9f1db0/627994439714467b34e36fe2_Ocxlr7QAAB3vh2ZWl3kAxWx_Tlswthn9tBk1YTnnI0j-9EJpxKHU-PB_9Ur9ud3EkOpFPo8ObN0qQd1_x2MNV5uR.jpg);
   background-position: 0 0, 0 0;
   background-size: auto, cover;
 }
@@ -10161,35 +10161,35 @@ figcaption {
 
 @font-face {
   font-family: 'CraftworkGrotesk';
-  src: local('Arial'), local('Helvetica'), local('sans-serif');
+  src: url('/Portfolio/assets/fonts/CraftworkGrotesk-Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'CraftworkGrotesk';
-  src: local('Arial Bold'), local('Helvetica Bold'), local('sans-serif');
-  font-weight: 700;
+  src: url('/Portfolio/assets/fonts/CraftworkGrotesk-Medium.ttf') format('truetype');
+  font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'CraftworkGrotesk';
-  src: local('Arial'), local('Helvetica'), local('sans-serif');
+  src: url('/Portfolio/assets/fonts/CraftworkGrotesk-SemiBold.ttf') format('truetype');
   font-weight: 600;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'CraftworkGrotesk';
-  src: local('Arial'), local('Helvetica'), local('sans-serif');
+  src: url('/Portfolio/assets/fonts/CraftworkGrotesk-Bold.ttf') format('truetype');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'CraftworkGrotesk';
-  src: local('Arial'), local('Helvetica'), local('sans-serif');
+  src: url('/Portfolio/assets/fonts/CraftworkGrotesk-Heavy.ttf') format('truetype');
   font-weight: 900;
   font-style: normal;
   font-display: swap;
