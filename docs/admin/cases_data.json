@@ -1,5 +1,26 @@
 [
   {
+    "slug": "clean-pro",
+    "title": "Clean Pro",
+    "category": "Сайты",
+    "cover_image": "/Portfolio/assets/62798ca94d23ebecbad7d197/640eea806be61f7eff982982_Mockup%2013.jpg",
+    "enabled": true,
+    "specialization": "Чистка и уход",
+    "duration": "1 месяц",
+    "services": [
+      "Дизайн",
+      "Верстка"
+    ],
+    "year": "2023",
+    "website_url": "",
+    "short_description": "Современный сайт для клининговой компании с онлайн-записью услуг.",
+    "description": "Разработали современный и функциональный сайт для клининговой компании Clean Pro. Проект включает удобную систему онлайн-записи услуг, каталог работ с ценами, галерею выполненных проектов и блог с полезными советами по уходу. Реализован адаптивный дизайн для всех устройств и интеграция с платежными системами.",
+    "gallery": [
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/640eea806be61f7eff982982_Mockup%2013.jpg"
+    ],
+    "blocks": []
+  },
+  {
     "slug": "actorsworld",
     "title": "ActorsWorld",
     "category": "Презентации",
