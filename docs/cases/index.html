@@ -39,6 +39,15 @@ window.__casesEnabledFix=true;
     const cardsContainer = document.querySelector('.cases-cl');
     if (!cardsContainer) return;
 
+    // Wrap container in 2-col-grid if not already
+    const parent = cardsContainer.parentElement;
+    if (!parent.classList.contains('_2-col-grid')) {
+      const gridWrapper = document.createElement('div');
+      gridWrapper.className = '_2-col-grid';
+      parent.insertBefore(gridWrapper, cardsContainer);
+      gridWrapper.appendChild(cardsContainer);
+    }
+
     // Get existing cards from DOM
     const existingCards = Array.from(document.querySelectorAll('.cases-ci'));
     
@@ -57,23 +66,21 @@ window.__casesEnabledFix=true;
   }
 
   function createProjectCard(project) {
-    // Create card element with proper Webflow structure
+    // Create simple card like on old site
     const card = document.createElement('div');
     card.className = 'cases-ci w-dyn-item';
     
     card.innerHTML = `
-      <div class="case-col1">
-        <div class="case-year">
-          <div class="text-23px">${project.title}</div>
-          <div class="filter-fields-hidden w-condition-invisible">
-            <div fs-cmsfilter-field="category">${project.category}</div>
+      <a href="/Portfolio/proekty/${project.slug}" class="case-link w-inline-block">
+        <div class="case-col1">
+          <div class="case-year">
+            <div class="text-23px">${project.title}</div>
+          </div>
+          <div class="case-image-box" style="display: block;">
+            <img src="${project.cover_image.startsWith('/Portfolio/') ? project.cover_image : '/Portfolio' + project.cover_image}" loading="lazy" alt="" class="case-image">
           </div>
         </div>
-        <div class="case-image-box" style="display: block;">
-          <img src="${project.cover_image.startsWith('/Portfolio/') ? project.cover_image : '/Portfolio' + project.cover_image}" loading="lazy" alt="" class="case-image">
-        </div>
-        <a href="/Portfolio/proekty/${project.slug}" class="case-link w-inline-block"></a>
-      </div>
+      </a>
     `;
     
     return card;
