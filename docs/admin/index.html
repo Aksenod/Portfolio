@@ -1114,19 +1114,29 @@
     // Normalize image URL - convert relative paths to absolute
     function normalizeImageUrl(url) {
       if (!url) return '';
+      url = String(url).trim();
       // Already absolute URL
       if (url.startsWith('http://') || url.startsWith('https://')) {
+        return url;
+      }
+      // Data URLs
+      if (url.startsWith('data:')) {
         return url;
       }
       // Relative path starting with /Portfolio/
       if (url.startsWith('/Portfolio/')) {
         return ASSETS_BASE_URL + url;
       }
+      // Relative path starting with Portfolio/ (missing leading slash)
+      if (url.startsWith('Portfolio/')) {
+        return ASSETS_BASE_URL + '/' + url;
+      }
       // Other relative paths
       if (url.startsWith('/')) {
         return ASSETS_BASE_URL + url;
       }
-      return url;
+      // Any other relative path (e.g. assets/..., images/...)
+      return ASSETS_BASE_URL + '/' + url;
     }
 
     // API helpers
