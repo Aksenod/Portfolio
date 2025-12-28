@@ -1,0 +1,158 @@
+# Portfolio Project Rules
+
+## Project Overview
+Full-stack portfolio website with FastAPI backend + JWT auth + PostgreSQL/SQLite and GitHub Pages frontend.
+
+## Stack
+- **Backend**: FastAPI, Python 3.12, SQLAlchemy, JWT auth, PostgreSQL (Render) / SQLite (local)
+- **Frontend**: Vanilla JS, HTML/CSS, GitHub Pages
+- **Fonts**: CraftworkGrotesk (Regular, Medium, Bold, Heavy)
+- **Deploy**: Render (backend), GitHub Pages (frontend)
+
+## Backend Architecture
+
+### Endpoints
+- `POST /auth/login` - JWT authentication
+- `GET /cases` - Public cases list (only enabled=true)
+- `GET/POST/PATCH/DELETE /admin/cases` - Admin cases management (JWT required)
+- `GET /health` - Health check
+- `GET /docs` - Swagger UI
+
+### Environment Variables
+```
+JWT_SECRET=your-secret-key
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD_HASH=hashed-password
+FRONTEND_ORIGINS=http://localhost:4173,https://aksenod.github.io
+DATABASE_URL=postgresql://... (auto-converted to postgresql://)
+```
+
+### Critical Rules
+1. **Password Handling**: NEVER re-hash already hashed passwords on requests
+2. **CORS**: Always normalize FRONTEND_ORIGINS
+3. **Database URL**: Normalize postgres:// → postgresql:// for SQLAlchemy
+4. **Python Version**: Lock to 3.12.8 (backend/runtime.txt)
+5. **Start Command**: Use ./start.sh (creates tables + runs uvicorn)
+
+## Frontend Architecture
+
+### Structure
+```
+docs/
+  ├── index.html
+  ├── 404.html
+  ├── api-config.js (API_BASE_URL)
+  ├── _redirects
+  ├── assets/
+  │   └── fonts/ (CraftworkGrotesk-*.ttf)
+  ├── cases/
+  ├── admin/
+  ├── about/
+  └── [other pages]
+```
+
+### Font Loading
+- All fonts MUST be regular Git commits (NOT Git LFS)
+- Expected: CraftworkGrotesk-Regular/Medium/Bold/Heavy.ttf
+- Check: DevTools → Network → filter "ttf" → status 200, size ~50KB
+
+### API Configuration
+- Production: `https://portfolio-saqh.onrender.com`
+- Local: `http://127.0.0.1:8000`
+
+## Deployment
+
+### Render (Backend)
+- **Root Directory**: `backend`
+- **Build Command**: `pip install -r requirements.txt`
+- **Start Command**: `./start.sh`
+- **Runtime**: Python 3.12.8 (backend/runtime.txt)
+
+### GitHub Pages (Frontend)
+- **Branch**: main
+- **Folder**: /docs
+- **URL**: https://aksenod.github.io/Portfolio/
+
+## File Structure
+```
+Portfolio/
+├── backend/
+│   ├── main.py
+│   ├── requirements.txt
+│   ├── runtime.txt (python-3.12.8)
+│   ├── start.sh (chmod +x)
+│   ├── .env.example
+│   └── README.md
+├── docs/ (frontend)
+│   ├── index.html
+│   ├── api-config.js
+│   └── assets/fonts/*.ttf
+├── .cursorrules
+└── README.md
+```
+
+## Development Workflow
+
+### Local Development
+```bash
+# Backend
+cd backend
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env  # Edit with your values
+uvicorn main:app --reload
+
+# Frontend
+cd docs
+python -m http.server 4173
+```
+
+### Testing
+- Backend health: `curl http://localhost:8000/health`
+- Swagger docs: `http://localhost:8000/docs`
+- Frontend: `http://localhost:4173`
+
+### Deployment Checklist
+1. ✅ Backend: Render service created with correct env vars
+2. ✅ Backend: start.sh executable and working
+3. ✅ Backend: /health, /docs, /cases return 200
+4. ✅ Frontend: Pushed to main branch /docs folder
+5. ✅ Frontend: GitHub Pages enabled (main/docs)
+6. ⚠️ Fonts: Remove Git LFS, commit as regular files
+7. ✅ CORS: FRONTEND_ORIGINS includes production URL
+
+## Common Issues & Solutions
+
+### Backend
+- **psycopg2 ImportError**: Check runtime.txt = python-3.12.8 (not 3.13)
+- **Database connection error**: Verify DATABASE_URL normalization
+- **Password auth failing**: Check ADMIN_PASSWORD_HASH not re-hashing
+- **CORS errors**: Verify FRONTEND_ORIGINS includes requesting origin
+
+### Frontend
+- **Fonts not loading (0.2KB)**: Git LFS pointers instead of real files
+  - Solution: `git lfs untrack "*.ttf"`, re-add fonts, commit
+- **API errors**: Check api-config.js has correct backend URL
+- **404 on refresh**: Verify _redirects or 404.html exists
+
+## Security
+- Never commit .env files
+- Use strong JWT_SECRET (32+ chars)
+- Password hashes only (bcrypt)
+- CORS restricted to known origins
+- Admin endpoints require JWT
+
+## AI Development Guidelines
+- When asked to check/verify: Use browser automation, take screenshots
+- Preserve exact user specifications (endpoints, commands, env vars)
+- For Render: Always check Settings + Logs tabs
+- For fonts: Verify actual file sizes (should be ~50KB, not 0.2KB)
+- Russian instructions: Respond in Russian, preserve commands verbatim
+
+## Next Steps
+1. Fix Git LFS fonts issue (priority)
+2. Test full auth flow (login → admin panel)
+3. Add more cases via admin API
+4. Monitor Render logs for errors
+5. Performance optimization if needed
