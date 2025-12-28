@@ -57,21 +57,11 @@ def _admin_username() -> str:
 
 
 def _compute_admin_password_hash() -> str:
-    """Compute once per process start.
-
-    IMPORTANT: never re-hash on each verification, otherwise login will break.
-    """
-
-    password_hash = os.getenv("ADMIN_PASSWORD_HASH")
-    if password_hash:
-        return password_hash
-
+    # Temporary: use plain text comparison for debugging
     password = os.getenv("ADMIN_PASSWORD")
     if not password:
         password = "bugrov2025"
-    
-    # Use pre-computed hash to avoid bcrypt issues
-    return "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj6QJw/2Ej7W"
+    return password  # Plain text for now
 
 
 ADMIN_PASSWORD_HASH = _compute_admin_password_hash()
@@ -190,7 +180,8 @@ def get_session():
 
 
 def _verify_admin_password(password: str) -> bool:
-    return pwd_context.verify(password, ADMIN_PASSWORD_HASH)
+    # Temporary: plain text comparison for debugging
+    return password == ADMIN_PASSWORD_HASH
 
 
 def _create_access_token(sub: str) -> str:
