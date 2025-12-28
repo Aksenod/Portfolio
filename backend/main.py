@@ -193,9 +193,57 @@ app.add_middleware(
 )
 
 
+def _import_cases_from_json() -> None:
+    """Import cases from JSON file if database is empty."""
+    import json
+    from pathlib import Path
+
+    json_path = Path(__file__).parent / "cases_data.json"
+    if not json_path.exists():
+        print("No cases_data.json found, skipping import")
+        return
+
+    with Session(engine) as session:
+        # Check if there are already projects
+        existing = session.exec(select(Project)).first()
+        if existing:
+            print("Database already has projects, skipping import")
+            return
+
+        # Load and import cases
+        with open(json_path, "r", encoding="utf-8") as f:
+            cases = json.load(f)
+
+        print(f"Importing {len(cases)} cases from JSON...")
+
+        for case_data in cases:
+            project = Project(
+                slug=case_data["slug"],
+                title=case_data["title"],
+                category=case_data.get("category", "Сайты"),
+                cover_image=case_data.get("cover_image", ""),
+                enabled=case_data.get("enabled", True),
+                specialization=case_data.get("specialization", ""),
+                duration=case_data.get("duration", ""),
+                services=case_data.get("services", []),
+                year=case_data.get("year", ""),
+                website_url=case_data.get("website_url", ""),
+                short_description=case_data.get("short_description", ""),
+                description=case_data.get("description", ""),
+                gallery=case_data.get("gallery", []),
+                blocks=case_data.get("blocks", []),
+            )
+            session.add(project)
+            print(f"  Imported: {project.title}")
+
+        session.commit()
+        print("Import complete!")
+
+
 @app.on_event("startup")
 def _startup() -> None:
     SQLModel.metadata.create_all(engine)
+    _import_cases_from_json()
 
 
 def get_session():
