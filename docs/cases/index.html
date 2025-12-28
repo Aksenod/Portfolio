@@ -76,12 +76,30 @@ window.__casesEnabledFix=true;
           <div class="case-year">
             <div class="text-23px">${project.title}</div>
           </div>
-          <div class="case-image-box" style="display: block;">
+          <div class="case-image-box" style="display: none; opacity: 0; transition: opacity 0.3s ease;">
             <img src="${project.cover_image.startsWith('/Portfolio/') ? project.cover_image : '/Portfolio' + project.cover_image}" loading="lazy" alt="" class="case-image">
           </div>
         </div>
       </a>
     `;
+    
+    // Add hover effect
+    const link = card.querySelector('.case-link');
+    const imageBox = card.querySelector('.case-image-box');
+    
+    link.addEventListener('mouseenter', () => {
+      imageBox.style.display = 'block';
+      setTimeout(() => {
+        imageBox.style.opacity = '1';
+      }, 10);
+    });
+    
+    link.addEventListener('mouseleave', () => {
+      imageBox.style.opacity = '0';
+      setTimeout(() => {
+        imageBox.style.display = 'none';
+      }, 300);
+    });
     
     return card;
   }
