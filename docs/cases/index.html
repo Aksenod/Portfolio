@@ -70,7 +70,7 @@ window.__casesEnabledFix=true;
 
   function createProjectCard(project) {
     const card = document.createElement('div');
-    card.className = 'cases-ci w-dyn-item';
+    card.className = 'service-row cases-row cases-ci w-dyn-item';
 
     const cover = project.cover_image && project.cover_image.startsWith('/Portfolio/')
       ? project.cover_image
@@ -79,7 +79,7 @@ window.__casesEnabledFix=true;
     const categoryTag = (project.category || '').toLowerCase();
 
     card.innerHTML = `
-      <div class="case-col1">
+      <div class="_4-col-grid vertical-center">
         <div class="case-year">2023</div>
         <div class="text-23px">${project.title || ''}</div>
         <div class="tag-clw">
@@ -88,11 +88,11 @@ window.__casesEnabledFix=true;
           </div>
         </div>
         <div class="text-23px">Figma</div>
-        <div class="case-image-box">
-          <img src="${cover}" loading="lazy" alt="" class="case-image">
-        </div>
-        <a href="/Portfolio/proekty/${project.slug}" class="case-link w-inline-block"></a>
       </div>
+      <div class="case-image-box">
+        <img src="${cover}" loading="lazy" alt="" class="case-image">
+      </div>
+      <a href="/Portfolio/proekty/${project.slug}" class="case-link w-inline-block"></a>
     `;
 
     return card;
