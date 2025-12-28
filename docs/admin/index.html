@@ -1104,6 +1104,7 @@
   <script>
     // API Configuration
     const API_BASE = window.__API_BASE || 'https://your-backend-url.onrender.com';
+    const ASSETS_BASE_URL = 'https://aksenod.github.io';
 
     let authToken = localStorage.getItem('adminToken');
     let projects = [];
@@ -1112,6 +1113,25 @@
     let currentGallery = [];
     let currentCoverImage = '';
     let currentCategory = 'all';
+    let isLoading = false;
+
+    // Normalize image URL - convert relative paths to absolute
+    function normalizeImageUrl(url) {
+      if (!url) return '';
+      // Already absolute URL
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        return url;
+      }
+      // Relative path starting with /Portfolio/
+      if (url.startsWith('/Portfolio/')) {
+        return ASSETS_BASE_URL + url;
+      }
+      // Other relative paths
+      if (url.startsWith('/')) {
+        return ASSETS_BASE_URL + url;
+      }
+      return url;
+    }
 
     // API helpers
     async function apiRequest(endpoint, options = {}) {
@@ -1180,13 +1200,31 @@
 
     // Projects CRUD
     async function loadProjects() {
+      const grid = document.getElementById('projectsGrid');
+      isLoading = true;
+      grid.innerHTML = `
+        <div class="empty-state" style="grid-column: 1/-1">
+          <div class="empty-state-icon">⏳</div>
+          <p>Загрузка кейсов...</p>
+        </div>
+      `;
+
       try {
         projects = await apiRequest('/admin/projects');
+        isLoading = false;
         renderProjects();
       } catch (error) {
         console.error('Failed to load projects:', error);
+        isLoading = false;
         projects = [];
-        renderProjects();
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column: 1/-1">
+            <div class="empty-state-icon">⚠️</div>
+            <p>Не удалось загрузить кейсы</p>
+            <p style="font-size: 13px; color: #666; margin-bottom: 16px">${error.message}</p>
+            <button class="add-btn" onclick="loadProjects()">Попробовать снова</button>
+          </div>
+        `;
       }
     }
 
@@ -1272,10 +1310,12 @@
         return;
       }
 
-      grid.innerHTML = filteredProjects.map(p => `
+      grid.innerHTML = filteredProjects.map(p => {
+        const coverUrl = normalizeImageUrl(p.cover_image);
+        return `
         <div class="project-card ${p.enabled ? '' : 'disabled'}" data-id="${p.id}" onclick="editProject('${p.id}')">
-          <div class="project-card-image ${!p.cover_image ? 'no-image' : ''}">
-            ${p.cover_image ? `<img src="${p.cover_image}" alt="${p.title}" onerror="this.parentElement.classList.add('no-image'); this.style.display='none'">` : ''}
+          <div class="project-card-image ${!coverUrl ? 'no-image' : ''}">
+            ${coverUrl ? `<img src="${coverUrl}" alt="${p.title}" onerror="this.parentElement.classList.add('no-image'); this.style.display='none'">` : ''}
             <div class="project-card-badge">${p.category}</div>
           </div>
           <div class="project-card-content">
@@ -1297,7 +1337,7 @@
             </div>
           </div>
         </div>
-      `).join('');
+      `}).join('');
     }
 
     // Toggle project visibility
@@ -1359,13 +1399,15 @@
     function renderGallery() {
       const grid = document.getElementById('galleryGrid');
 
-      grid.innerHTML = currentGallery.map((url, index) => `
+      grid.innerHTML = currentGallery.map((url, index) => {
+        const imgUrl = normalizeImageUrl(url);
+        return `
         <div class="gallery-item" draggable="true" data-index="${index}">
-          <img src="${url}" alt="Gallery image ${index + 1}" onerror="this.parentElement.style.display='none'">
+          <img src="${imgUrl}" alt="Gallery image ${index + 1}" onerror="this.parentElement.style.display='none'">
           <button type="button" class="gallery-item-remove" onclick="removeGalleryImage(${index})">&times;</button>
           <div class="gallery-item-index">${index + 1}</div>
         </div>
-      `).join('');
+      `}).join('');
 
       // Add drag-and-drop handlers
       initGalleryDragDrop();
@@ -1430,7 +1472,7 @@
         document.getElementById('coverUploadZone').style.display = 'none';
         document.getElementById('coverUrlMode').style.display = 'none';
         document.getElementById('coverPreview').style.display = 'block';
-        document.getElementById('coverPreviewImg').src = url;
+        document.getElementById('coverPreviewImg').src = normalizeImageUrl(url);
       } else {
         document.getElementById('coverPreview').style.display = 'none';
         document.getElementById('coverUploadZone').style.display = 'block';
