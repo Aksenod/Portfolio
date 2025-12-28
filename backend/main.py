@@ -398,6 +398,15 @@ def _get_current_admin(credentials: HTTPAuthorizationCredentials = Depends(secur
 def health() -> dict:
     return {"ok": True, "ts": _now_utc().isoformat()}
 
+@app.post("/force-update")
+def force_update() -> dict:
+    """Force update all projects from JSON data"""
+    try:
+        _update_existing_projects_from_json()
+        return {"status": "success", "message": "Projects updated from JSON"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
 
 @app.post("/auth/login", response_model=TokenResponse)
 def login(body: LoginRequest) -> TokenResponse:
