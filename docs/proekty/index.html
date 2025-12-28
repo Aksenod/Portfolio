@@ -268,28 +268,57 @@
     }
 
     function renderFallbackProject(project) {
-      // Basic markdown to HTML conversion
-      let descriptionHtml = (project.description || '')
-        .replace(/^### (.*$)/gim, '<h3 class="heading-3">$1</h3>')
-        .replace(/^## (.*$)/gim, '<h2 class="heading-2">$1</h2>')
-        .replace(/^# (.*$)/gim, '<h1 class="heading-1">$1</h1>')
-        .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
-        .replace(/\*(.*)\*/gim, '<em>$1</em>')
-        .replace(/\n/g, '<br>');
+      // Project info grid (specialization, duration, services, year)
+      const projectInfoHtml = `
+        <div class="_4-col-grid">
+          <div class="project-info-col">
+            <div class="pi-title">специализация</div>
+            <div>${escapeHtml(project.specialization || '')}</div>
+          </div>
+          <div class="project-info-col">
+            <div class="pi-title">срок</div>
+            <div>${escapeHtml(project.duration || '')}</div>
+          </div>
+          <div class="project-info-col">
+            <div class="pi-title">услуги</div>
+            <div class="w-dyn-list">
+              <div role="list" class="w-dyn-items">
+                ${(project.services || []).map(service => `
+                  <div role="listitem" class="w-dyn-item">
+                    <div>${escapeHtml(service)}</div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+          <div class="project-info-col">
+            <div class="pi-title">год</div>
+            <div>${escapeHtml(project.year || '')}</div>
+          </div>
+        </div>
+      `;
 
+      // Gallery section
       let galleryHtml = '';
       if (project.gallery && project.gallery.length > 0) {
         galleryHtml = `
-          <section class="section-new">
+          <section class="section-new project-s2-section">
             <div class="container-new">
-              <div class="content-block mt-100">
-                <div class="w-layout-grid grid-45">
-                  ${project.gallery.map(img => `
-                    <div class="image-wrapper">
-                      <img src="${escapeHtml(img)}" loading="lazy" alt="" class="image-contain"/>
-                      <div class="image-owerlay"></div>
-                    </div>
-                  `).join('')}
+              <div class="section-core is-relative">
+                <div class="heading-wrap is-uplined"></div>
+              </div>
+              <div class="content-block">
+                <div class="w-dyn-list">
+                  <div role="list" class="w-dyn-items">
+                    ${project.gallery.map((img, index) => `
+                      <div role="listitem" class="w-dyn-item">
+                        <div class="image-wrapper">
+                          <img src="${escapeHtml(img)}" loading="lazy" alt="" class="case-image"/>
+                          <div class="image-owerlay"></div>
+                        </div>
+                      </div>
+                    `).join('')}
+                  </div>
                 </div>
               </div>
             </div>
@@ -328,11 +357,13 @@
                 ` : ''}
               </div>
             </div>
-            ${project.short_description ? `
-              <div class="content-block mt-100">
-                <div class="text-45px">${escapeHtml(project.short_description)}</div>
-              </div>
-            ` : ''}
+            <div class="content-block mt-100">
+              ${projectInfoHtml}
+            </div>
+            <div class="content-block mt-100 is-relative">
+              <div class="pi-title absolute-on-dt">О проекте</div>
+              <div class="text-45px">${escapeHtml(project.short_description || '')}</div>
+            </div>
             ${project.cover_image ? `
               <div class="content-block mt-100">
                 <div class="image-wrap">
@@ -346,17 +377,40 @@
           </div>
         </section>
         
-        ${descriptionHtml ? `
+        ${project.description ? `
           <section class="section-new">
             <div class="container-new">
-              <div class="content-block mt-100">
-                <div class="text-45px">${descriptionHtml}</div>
+              <div class="section-core">
+                <div class="content-block mt-100">
+                  <div class="text-45px">${escapeHtml(project.description)}</div>
+                </div>
               </div>
             </div>
           </section>
         ` : ''}
         
         ${galleryHtml}
+        
+        <section class="section-new">
+          <div class="container-new">
+            <div class="section-core">
+              <div class="content-block mt-100">
+                <div class="text-24px cercle-button-text">Обсудить ваш проект</div>
+                <a href="/Portfolio/contacts" class="round-button w-inline-block">
+                  <div>Связаться с нами</div>
+                  <div class="_24-button-arrow">
+                    <div class="svg w-embed">
+                      <svg width="100%" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 8.83337V32.1667" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M8.33398 20.5H31.6673" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
       `;
     }
 
