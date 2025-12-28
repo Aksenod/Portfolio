@@ -324,6 +324,36 @@ def _update_existing_projects_from_json() -> None:
             print(f"Updated {updated_count} projects with data from JSON")
         else:
             print("All projects already have complete data")
+        
+        # Create new projects that exist in JSON but not in DB
+        existing_slugs = {p.slug for p in projects}
+        new_slugs = set(cases_by_slug.keys()) - existing_slugs
+        
+        if new_slugs:
+            print(f"Creating {len(new_slugs)} new projects...")
+            for slug in new_slugs:
+                case_data = cases_by_slug[slug]
+                project = Project(
+                    slug=case_data["slug"],
+                    title=case_data["title"],
+                    category=case_data.get("category", "Сайты"),
+                    cover_image=case_data.get("cover_image", ""),
+                    enabled=case_data.get("enabled", True),
+                    specialization=case_data.get("specialization", ""),
+                    duration=case_data.get("duration", ""),
+                    services=case_data.get("services", []),
+                    year=case_data.get("year", ""),
+                    website_url=case_data.get("website_url", ""),
+                    short_description=case_data.get("short_description", ""),
+                    description=case_data.get("description", ""),
+                    gallery=case_data.get("gallery", []),
+                    blocks=case_data.get("blocks", []),
+                )
+                session.add(project)
+                print(f"  Created: {project.title}")
+            
+            session.commit()
+            print(f"Created {len(new_slugs)} new projects")
 
 
 def _migrate_database() -> None:
