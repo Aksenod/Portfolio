@@ -240,8 +240,46 @@ def _import_cases_from_json() -> None:
         print("Import complete!")
 
 
+def _migrate_database() -> None:
+    """Add missing columns to existing tables for SQLite compatibility."""
+    from sqlalchemy import inspect, text
+
+    inspector = inspect(engine)
+
+    # Check if project table exists
+    if "project" not in inspector.get_table_names():
+        return  # Table will be created by create_all
+
+    # Get existing columns
+    existing_columns = {col["name"] for col in inspector.get_columns("project")}
+
+    # Define new columns that might be missing (column_name, type, default)
+    new_columns = [
+        ("specialization", "TEXT", "''"),
+        ("duration", "TEXT", "''"),
+        ("services", "TEXT", "'[]'"),  # JSON stored as TEXT in SQLite
+        ("year", "TEXT", "''"),
+        ("website_url", "TEXT", "''"),
+        ("short_description", "TEXT", "''"),
+        ("description", "TEXT", "''"),
+        ("gallery", "TEXT", "'[]'"),  # JSON stored as TEXT in SQLite
+    ]
+
+    with engine.connect() as conn:
+        for col_name, col_type, default in new_columns:
+            if col_name not in existing_columns:
+                print(f"Adding missing column: {col_name}")
+                conn.execute(text(f"ALTER TABLE project ADD COLUMN {col_name} {col_type} DEFAULT {default}"))
+        conn.commit()
+
+    print("Database migration complete!")
+
+
 @app.on_event("startup")
 def _startup() -> None:
+    # First, run migrations to add any missing columns
+    _migrate_database()
+    # Then create any new tables
     SQLModel.metadata.create_all(engine)
     _import_cases_from_json()
 
