@@ -272,6 +272,7 @@ def _update_existing_projects_from_json() -> None:
                 not project.services and case_data.get("services") or
                 not project.year and case_data.get("year") or
                 not project.short_description and case_data.get("short_description") or
+                not project.description and case_data.get("description") or
                 not project.gallery and case_data.get("gallery")
             )
 
