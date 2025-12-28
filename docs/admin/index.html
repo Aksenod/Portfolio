@@ -825,6 +825,62 @@
       font-size: 14px;
       color: #ccc;
     }
+
+    /* Category Tabs */
+    .category-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .category-tab {
+      padding: 10px 20px;
+      background: transparent;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #888;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .category-tab:hover {
+      border-color: #555;
+      color: #fff;
+    }
+
+    .category-tab.active {
+      background: #fff;
+      color: #000;
+      border-color: #fff;
+    }
+
+    .category-tab .count {
+      margin-left: 6px;
+      padding: 2px 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      font-size: 12px;
+    }
+
+    .category-tab.active .count {
+      background: rgba(0,0,0,0.1);
+    }
+
+    /* Image placeholder */
+    .project-card-image.no-image {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+    }
+
+    .project-card-image.no-image::after {
+      content: "🖼️";
+      font-size: 48px;
+      opacity: 0.3;
+    }
   </style>
 </head>
 <body>
@@ -858,6 +914,15 @@
       <div class="section-header">
         <h2>Кейсы</h2>
         <button class="add-btn" id="addProjectBtn">+ Добавить кейс</button>
+      </div>
+      <div class="category-tabs" id="categoryTabs">
+        <button class="category-tab active" data-category="all">Все<span class="count" id="countAll">0</span></button>
+        <button class="category-tab" data-category="Сайты">Сайты<span class="count" id="countСайты">0</span></button>
+        <button class="category-tab" data-category="Презентации">Презентации<span class="count" id="countПрезентации">0</span></button>
+        <button class="category-tab" data-category="Брендинг">Брендинг<span class="count" id="countБрендинг">0</span></button>
+        <button class="category-tab" data-category="Аудит">Аудит<span class="count" id="countАудит">0</span></button>
+        <button class="category-tab" data-category="Рекомендации">Рекомендации<span class="count" id="countРекомендации">0</span></button>
+        <button class="category-tab" data-category="Сервисы">Сервисы<span class="count" id="countСервисы">0</span></button>
       </div>
       <div class="projects-grid" id="projectsGrid">
         <!-- Projects will be rendered here -->
@@ -897,6 +962,7 @@
                   <option value="Брендинг">Брендинг</option>
                   <option value="Аудит">Аудит</option>
                   <option value="Рекомендации">Рекомендации</option>
+                  <option value="Сервисы">Сервисы</option>
                 </select>
               </div>
               <div class="form-group">
@@ -1045,6 +1111,7 @@
     let currentServices = [];
     let currentGallery = [];
     let currentCoverImage = '';
+    let currentCategory = 'all';
 
     // API helpers
     async function apiRequest(endpoint, options = {}) {
@@ -1167,25 +1234,48 @@
       }
     }
 
+    // Update category counts
+    function updateCategoryCounts() {
+      const categories = ['Сайты', 'Презентации', 'Брендинг', 'Аудит', 'Рекомендации', 'Сервисы'];
+
+      // Update total count
+      document.getElementById('countAll').textContent = projects.length;
+
+      // Update each category count
+      categories.forEach(cat => {
+        const count = projects.filter(p => p.category === cat).length;
+        const el = document.getElementById('count' + cat);
+        if (el) el.textContent = count;
+      });
+    }
+
     // Render projects grid
     function renderProjects() {
       const grid = document.getElementById('projectsGrid');
 
-      if (projects.length === 0) {
+      // Update counts
+      updateCategoryCounts();
+
+      // Filter projects by category
+      const filteredProjects = currentCategory === 'all'
+        ? projects
+        : projects.filter(p => p.category === currentCategory);
+
+      if (filteredProjects.length === 0) {
         grid.innerHTML = `
           <div class="empty-state" style="grid-column: 1/-1">
             <div class="empty-state-icon">📁</div>
-            <p>Кейсов пока нет</p>
-            <button class="add-btn" onclick="openAddModal()">+ Добавить первый кейс</button>
+            <p>${currentCategory === 'all' ? 'Кейсов пока нет' : 'В этой категории пока нет кейсов'}</p>
+            <button class="add-btn" onclick="openAddModal()">+ Добавить кейс</button>
           </div>
         `;
         return;
       }
 
-      grid.innerHTML = projects.map(p => `
+      grid.innerHTML = filteredProjects.map(p => `
         <div class="project-card ${p.enabled ? '' : 'disabled'}" data-id="${p.id}" onclick="editProject('${p.id}')">
-          <div class="project-card-image">
-            ${p.cover_image ? `<img src="${p.cover_image}" alt="${p.title}" onerror="this.style.display='none'">` : ''}
+          <div class="project-card-image ${!p.cover_image ? 'no-image' : ''}">
+            ${p.cover_image ? `<img src="${p.cover_image}" alt="${p.title}" onerror="this.parentElement.classList.add('no-image'); this.style.display='none'">` : ''}
             <div class="project-card-badge">${p.category}</div>
           </div>
           <div class="project-card-content">
@@ -1475,6 +1565,16 @@
 
       // Add project
       document.getElementById('addProjectBtn').addEventListener('click', openAddModal);
+
+      // Category tabs
+      document.querySelectorAll('.category-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          currentCategory = tab.dataset.category;
+          renderProjects();
+        });
+      });
 
       // Modal close
       document.getElementById('modalClose').addEventListener('click', closeModal);
