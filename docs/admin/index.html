@@ -1168,7 +1168,11 @@
 
       if (!response.ok) {
         const error = await response.json().catch(() => ({ detail: 'Request failed' }));
-        throw new Error(error.detail || 'Request failed');
+        const detail = error && (error.detail ?? error.message);
+        if (typeof detail === 'string') {
+          throw new Error(detail || 'Request failed');
+        }
+        throw new Error(JSON.stringify(detail || error || 'Request failed'));
       }
 
       return response.json();
@@ -1311,6 +1315,9 @@
 
     async function deleteProject(id) {
       try {
+        if (String(id).startsWith('local-')) {
+          throw new Error('Этот кейс загружен из локального файла (offline режим) и не может быть удален через API.');
+        }
         await apiRequest(`/admin/projects/${id}`, { method: 'DELETE' });
         projects = projects.filter(p => p.id !== id);
         renderProjects();
@@ -1406,7 +1413,7 @@
         try {
           await deleteProject(id);
         } catch (error) {
-          alert('Не удалось удалить кейс');
+          alert('Не удалось удалить кейс: ' + (error && error.message ? error.message : String(error)));
         }
       }
     }
