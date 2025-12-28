@@ -1646,7 +1646,7 @@
       document.getElementById('logoutBtn').addEventListener('click', () => {
         localStorage.removeItem('adminToken');
         authToken = null;
-        showLoginScreen();
+        window.location.href = '/Portfolio/';
       });
 
       // Add project
