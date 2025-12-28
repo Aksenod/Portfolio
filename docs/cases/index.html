@@ -5,6 +5,15 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+.cases-ci .case-image-box {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.cases-ci:hover .case-image-box {
+  display: block;
+  opacity: 1;
+}
 </style>
 
 <!-- You can remove this -->
@@ -35,27 +44,13 @@ window.__casesEnabledFix=true;
   }
 
   function renderProjects() {
-    // Find existing case cards and update them or create new ones
     const cardsContainer = document.querySelector('.cases-cl');
     if (!cardsContainer) return;
 
-    // Wrap container in 2-col-grid if not already
-    const parent = cardsContainer.parentElement;
-    if (!parent.classList.contains('_2-col-grid')) {
-      const gridWrapper = document.createElement('div');
-      gridWrapper.className = '_2-col-grid';
-      parent.insertBefore(gridWrapper, cardsContainer);
-      gridWrapper.appendChild(cardsContainer);
-    }
-
-    // Get existing cards from DOM
     const existingCards = Array.from(document.querySelectorAll('.cases-ci'));
-    
-    // Clear existing cards
     existingCards.forEach(card => card.remove());
 
-    // Render projects that match current filter
-    const filteredProjects = currentFilter 
+    const filteredProjects = currentFilter
       ? projects.filter(p => p.category === currentFilter)
       : projects;
 
@@ -66,41 +61,32 @@ window.__casesEnabledFix=true;
   }
 
   function createProjectCard(project) {
-    // Create simple card like on old site
     const card = document.createElement('div');
     card.className = 'cases-ci w-dyn-item';
-    
+
+    const cover = project.cover_image && project.cover_image.startsWith('/Portfolio/')
+      ? project.cover_image
+      : '/Portfolio' + (project.cover_image || '');
+
+    const categoryTag = (project.category || '').toLowerCase();
+
     card.innerHTML = `
-      <a href="/Portfolio/proekty/${project.slug}" class="case-link w-inline-block">
-        <div class="case-col1">
-          <div class="case-year">
-            <div class="text-23px">${project.title}</div>
-          </div>
-          <div class="case-image-box" style="display: none; opacity: 0; transition: opacity 0.3s ease;">
-            <img src="${project.cover_image.startsWith('/Portfolio/') ? project.cover_image : '/Portfolio' + project.cover_image}" loading="lazy" alt="" class="case-image">
+      <div class="case-col1">
+        <div class="case-year">2023</div>
+        <div class="text-23px">${project.title || ''}</div>
+        <div class="tag-clw">
+          <div class="tag-cl">
+            <div class="case-tag">${categoryTag}</div>
           </div>
         </div>
-      </a>
+        <div class="text-23px">Figma</div>
+        <div class="case-image-box">
+          <img src="${cover}" loading="lazy" alt="" class="case-image">
+        </div>
+        <a href="/Portfolio/proekty/${project.slug}" class="case-link w-inline-block"></a>
+      </div>
     `;
-    
-    // Add hover effect
-    const link = card.querySelector('.case-link');
-    const imageBox = card.querySelector('.case-image-box');
-    
-    link.addEventListener('mouseenter', () => {
-      imageBox.style.display = 'block';
-      setTimeout(() => {
-        imageBox.style.opacity = '1';
-      }, 10);
-    });
-    
-    link.addEventListener('mouseleave', () => {
-      imageBox.style.opacity = '0';
-      setTimeout(() => {
-        imageBox.style.display = 'none';
-      }, 300);
-    });
-    
+
     return card;
   }
 
