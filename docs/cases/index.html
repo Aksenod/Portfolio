@@ -13,10 +13,9 @@
    opacity: 0;
    visibility: hidden;
    pointer-events: none;
-   transform: translateY(10px);
+   transform: translate(-50%, -50%) translateY(10px);
    transition: opacity 0.35s ease, transform 0.35s ease, visibility 0s linear 0.35s;
    top: 50%;
-   transform: translate(-50%, -50%) translateY(10px);
    left: 50%;
   }
   .cases-ci:hover .case-image-box {
@@ -24,6 +23,10 @@
    visibility: visible;
    transform: translate(-50%, -50%) translateY(0);
    transition: opacity 0.35s ease, transform 0.35s ease, visibility 0s;
+  }
+  .cases-ci .case-year {
+   flex: none;
+   width: auto !important;
   }
  </style>
 
