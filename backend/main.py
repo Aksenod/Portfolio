@@ -275,6 +275,10 @@ def _update_existing_projects_from_json() -> None:
                 not project.description and case_data.get("description") or
                 not project.gallery and case_data.get("gallery")
             )
+            
+            # Force update description if it's empty in DB but exists in JSON
+            if not needs_update and not project.description and case_data.get("description"):
+                needs_update = True
 
             if needs_update:
                 # Update fields that are empty but have data in JSON
