@@ -920,8 +920,6 @@
         <button class="category-tab" data-category="Сайты">Сайты<span class="count" id="countСайты">0</span></button>
         <button class="category-tab" data-category="Презентации">Презентации<span class="count" id="countПрезентации">0</span></button>
         <button class="category-tab" data-category="Брендинг">Брендинг<span class="count" id="countБрендинг">0</span></button>
-        <button class="category-tab" data-category="Аудит">Аудит<span class="count" id="countАудит">0</span></button>
-        <button class="category-tab" data-category="Рекомендации">Рекомендации<span class="count" id="countРекомендации">0</span></button>
         <button class="category-tab" data-category="Сервисы">Сервисы<span class="count" id="countСервисы">0</span></button>
       </div>
       <div class="projects-grid" id="projectsGrid">
@@ -960,8 +958,6 @@
                   <option value="Сайты">Сайты</option>
                   <option value="Презентации">Презентации</option>
                   <option value="Брендинг">Брендинг</option>
-                  <option value="Аудит">Аудит</option>
-                  <option value="Рекомендации">Рекомендации</option>
                   <option value="Сервисы">Сервисы</option>
                 </select>
               </div>
@@ -1306,7 +1302,7 @@
 
     // Update category counts
     function updateCategoryCounts() {
-      const categories = ['Сайты', 'Презентации', 'Брендинг', 'Аудит', 'Рекомендации', 'Сервисы'];
+      const categories = ['Сайты', 'Презентации', 'Брендинг', 'Сервисы'];
 
       // Update total count
       document.getElementById('countAll').textContent = projects.length;
