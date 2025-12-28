@@ -243,12 +243,26 @@ def _import_cases_from_json() -> None:
 def _update_existing_projects_from_json() -> None:
     """Update existing projects with data from JSON file (for migrations)."""
     import json
+    import requests
     from pathlib import Path
 
     json_path = Path(__file__).parent / "cases_data.json"
-    if not json_path.exists():
-        print("No cases_data.json found, skipping update")
-        return
+    
+    # Download fresh data from GitHub
+    try:
+        print("Downloading fresh cases_data.json from GitHub...")
+        url = "https://raw.githubusercontent.com/Aksenod/Portfolio/main/docs/admin/cases_data.json"
+        response = requests.get(url)
+        response.raise_for_status()
+        
+        with open(json_path, "w", encoding="utf-8") as f:
+            f.write(response.text)
+        print("Downloaded fresh cases_data.json")
+    except Exception as e:
+        print(f"Failed to download from GitHub: {e}")
+        if not json_path.exists():
+            print("No local cases_data.json found, skipping update")
+            return
 
     with open(json_path, "r", encoding="utf-8") as f:
         cases = json.load(f)
