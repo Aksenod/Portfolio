@@ -1,0 +1,348 @@
+[
+  {
+    "slug": "actorsworld",
+    "title": "ActorsWorld",
+    "category": "Презентации",
+    "cover_image": "/Portfolio/assets/62798ca94d23ebecbad7d197/6384ea47a73b0c404c0d8055_Group%2064.jpg",
+    "enabled": true,
+    "specialization": "Презентация для инвестора",
+    "duration": "2 недели",
+    "services": [
+      "Дизайн"
+    ],
+    "year": "2023",
+    "website_url": "",
+    "short_description": "Презентация для частного инвестора, под разработку мобильного приложения, на русском и на английском языках.",
+    "description": "",
+    "gallery": [
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6384ea4c4f108606d33997f6_01.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6384ea4c758ecc1853813dc9_02.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6384ea4bebaf6a160c57afd3_03.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6384ea4c83eff855daf9751a_04.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6384ea4c891b8900d82f987a_05.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6384ea4b1ca50907be854396_06.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6384ea4bfd42384f439e38b1_07.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6384ea4b7429a0ce6d8c83cf_08.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6384ea4b4f1086a1363997f2_09.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6384ea4b2001a535bbd6d274_10.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6384ea4be0af973659b9f442_11.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6384ea4bd0a815865b964121_12.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6384ea4b7429a0db988c83ce_13.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6384ea4b1447e83620883d81_14.jpg"
+    ],
+    "blocks": []
+  },
+  {
+    "slug": "endymion",
+    "title": "Endymion",
+    "category": "Брендинг",
+    "cover_image": "/Portfolio/assets/62798ca94d23ebecbad7d197/6356b3cc148cbdbc29d932fc_647603_sib6gndkuj7xf4o88qdpifxrp.jpg",
+    "enabled": true,
+    "specialization": "Трейдинг",
+    "duration": "2 месяца",
+    "services": [
+      "Брендинг"
+    ],
+    "year": "2023",
+    "website_url": "https://endimion.webflow.io",
+    "short_description": "Независимый трейдер полезных ископаемых - Полный спектр услуг по логистике, дистрибуции, экспедированию твердых углеводородов и нефтепродуктов",
+    "description": "",
+    "gallery": [
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/648029da2779844e9590bd38_77d6b6165615165.640a378077863.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/648029df1dad27a6090df034_c418d0165615165.640a37806c0ff.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/648029e1551782fa155fadd6_ed1061165615165.640a37807559f.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/648029e3382f148958a98039_5f82e9165615165.640a3780726e7.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/648029e51e635fc2625aed1d_3c20e0165615165.640a37806a110.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/648029e81dad27a6090e0634_17e61d165615165.640a3780765f9.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/648029ebd97704a58d8d2a2a_dff81d165615165.640a37806e21c.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/648029ec551782fa155fbadc_4bb902165615165.640a3780736dc.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/648029ec551782fa155fbadc_4bb902165615165.640a3780736dc.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/648029f0a732ebdbd40f866e_34c117165615165.640a3780716b8.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/648029f45f424d18f3d61fdd_afea19165615165.640a378078a15.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/648029f61dad27a6090e13c7_3d7c49165615165.640a37807066e.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/648029fa382f148958a992d2_0f2370165615165.640a37806afd5.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/648029fd1e635fc2625b04ee_b6e582165615165.640a37806f471.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/64802a00d2b60074b1630d7c_690c97165615165.640a378069075.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/64802a040d45637680501774_c20819165615165.640a3780746ac.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/64802a06382f148958a99d5b_8fd407165615165.640a37806d20b.png"
+    ],
+    "blocks": []
+  },
+  {
+    "slug": "fetratech",
+    "title": "Fetratech",
+    "category": "Сайты",
+    "cover_image": "/Portfolio/assets/62798ca94d23ebecbad7d197/640eea806be61f7eff982982_Mockup%2013.jpg",
+    "enabled": true,
+    "specialization": "Ваш компас в мире логистического бизнеса",
+    "duration": "2 месяца",
+    "services": [
+      "Брендинг"
+    ],
+    "year": "2023",
+    "website_url": "https://www.fetratech.ru/",
+    "short_description": "Цель проекта заключается в том, чтобы разработать современный и удобный фирменный стиль и сайт для логистической компании Fetratech, который поможет клиентам быстро и легко находить решения по самым разным логистическим задачам, таким как транспортировка грузов, оптимизация маршрутов, планирование доставок и многое другое.",
+    "description": "",
+    "gallery": [
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/640eea88ec3948415fc2300b_Minimal%20Screen%20Mockup%201.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/640eec8f48be60da8c0fb611_03.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/640eec8ffef4ebad6a07b0b4_04.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/640eec8f278630850a06b05f_05.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/640eec8f626d6c36d4325069_06.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/640eec8f7577f6e11f324124_07.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/640eec8f0dce3c3fd570ecc2_08.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/640eea88766e1200cbf2efd1_Frame%2018.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/640eec8fd034301496b8ebc4_10.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/640eec8f0e9d4e164f98b8a1_11.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/640eea883a879f719f6110ff_Frame%2019.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/640eea87e68e51cfe28d1bdd_Frame%2022.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/640eea87d1a77e37f99da2c6_Frame%2021.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/640eea8748be603e3a0f923b_Frame%2023.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/640eea8724ccc71f1dfd955c_Frame%2024.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/640eea88d5303ca811656723_Frame%2025.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/640eec8fccbd86bfe486fa01_18.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/640eea8748be604faf0f9236_Frame%2028.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/640eea870bae18f7e2eb7fae_Frame%2029.jpg"
+    ],
+    "blocks": []
+  },
+  {
+    "slug": "ksl-ag",
+    "title": "KSL AG",
+    "category": "Сайты",
+    "cover_image": "/Portfolio/assets/62798ca94d23ebecbad7d197/6279908d2e6ab2dc7b2e5412_bf82e8130971951.618b89fd7f7e4.png",
+    "enabled": true,
+    "specialization": "Корпоративный сайт",
+    "duration": "3 месяца",
+    "services": [
+      "Структура"
+    ],
+    "year": "2023",
+    "website_url": "https://ksl-new.webflow.io/",
+    "short_description": "Перед студией стояла амбициозная задача – создать понятный презентабельный сайт, отражающий масштаб компании заказчика, демонстрирующий её огромные возможности и статус на рынке.",
+    "description": "",
+    "gallery": [
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6279908d2e6ab2dc7b2e5412_bf82e8130971951.618b89fd7f7e4.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6279908f9714465221e34f80_c9a3d0130971951.618db0e74f572.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6279909179987647c7023420_832545130971951.618db0e74fc84.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/62799095c353551812dfcdd6_07b25f130971951.618db0e74ede5.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6279909731f7dcc1792571bb_230a06130971951.618b89fd7d76b.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6279909a56881a10dadbed1d_a777fd130971951.618b89fd8043a.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6279909d2e6ab289362e5444_e01cfb130971951.618b89fd81665.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627990a0a8557be4b63ffc24_6dfe11130971951.618b89fd80f63.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627990a57998764044023442_7eea6c130971951.618b89fd7ff0b.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627990a96a2ded2419034d3b_f574bf130971951.618b89fd7d215.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627990acc555ee09caff7c9c_97b04f130971951.618b89fd7ecea.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627990aea47f865fd8cad9ca_518b30130971951.618b89fd7ca60.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627990b27998760b3c023452_57fb68130971951.618db1efc9b88.png"
+    ],
+    "blocks": []
+  },
+  {
+    "slug": "miroko",
+    "title": "МИРОко",
+    "category": "Презентации",
+    "cover_image": "/Portfolio/assets/62798ca94d23ebecbad7d197/647dd112cc2c48ea96acbe96_Frame%2086.jpg",
+    "enabled": true,
+    "specialization": "Онлайн-сервис",
+    "duration": "2 недели",
+    "services": [
+      "Дизайн"
+    ],
+    "year": "2023",
+    "website_url": "",
+    "short_description": "Две презентации для онлайн-сервиса по оптовым закупкам. Одна рассказывает о сервисе, вторая для привлечения партнеров.",
+    "description": "",
+    "gallery": [
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/647dd4c8d5fade0e9d2f546e_1_%20(14).jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/647dd4bd6d510dbec407c230_1_%20(1).jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/647dd4bc37101ce399ab1e1c_1_%20(2).jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/647dd4bc566995db848b8e97_1_%20(3).jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/647dd4bd85d4a6eadad5e58d_1_%20(4).jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/647dd4bd56fe76aa9b0a613f_1_%20(5).jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/647dd4bc503b0dab59fc27bd_1_%20(6).jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/647dd4bd85d4a6eadad5e54e_1_%20(7).jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/647dd4bde46ea344f07aaa1f_1_%20(8).jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/647dd4bcc44c3fc748b4d279_1_%20(9).jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/647dd4bd57f12027a871b67b_1_%20(10).jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/647dd4bc404bd1673f024a59_1_%20(11).jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/647dd4bcdb0e40779aafb7a9_1_%20(12).jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/647dd4bdbe8f094f5a04b274_1_%20(13).jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/647dd59c284342c55bd546f8_02_01.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/647dd59e06246eacec05ad14_02_02.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/647dd5a06f6677ae8cf8418d_02_03.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/647dd5a2cac4e027cb6b3486_02_04.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/647dd5a4cdf8acb90fef9c1b_02_05.png"
+    ],
+    "blocks": []
+  },
+  {
+    "slug": "money-marketing",
+    "title": "Money Marketing",
+    "category": "Презентации",
+    "cover_image": "/Portfolio/assets/62798ca94d23ebecbad7d197/627bbeefb106d813fe6ce3fb_Money%20Marketing.jpg",
+    "enabled": true,
+    "specialization": "Презентация для вебинара",
+    "duration": "2 недели",
+    "services": [
+      "Дизайн"
+    ],
+    "year": "2022",
+    "website_url": "",
+    "short_description": "Сделали презентацию для вебинара всего за 4 дня. При необходимости укладываемся даже в самые сжатые сроки без потери качества.",
+    "description": "",
+    "gallery": [
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627ae85450f95ebc25d9d888_MM01.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627ae8603316d5619cf5d231_MM02.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627ae8603e354e306b18dda7_MM03.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627ae860f179fa3f80dce25f_MM04.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627ae86066f06c876bcf8f52_MM05.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627ae8606c890ed29c335c2f_MM06.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627ae860536b914ea36ef1f9_MM07.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627ae8607d59a115fc422670_MM08.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627ae860b299a2dd6752cda4_MM09.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627ae860d86f6f09b590db5a_MM10.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627ae860d86f6f607b90db5b_MM11.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627ae866519efc2a98319b77_MM12.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627ae8662deea477ae11719a_MM13.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627ae8666c890e1d9f335c40_MM14.jpg"
+    ],
+    "blocks": []
+  },
+  {
+    "slug": "svizraa",
+    "title": "Svizraa",
+    "category": "Презентации",
+    "cover_image": "/Portfolio/assets/62798ca94d23ebecbad7d197/627bbef760d9e33ff3ffc414_Svizraa.jpg",
+    "enabled": true,
+    "specialization": "Услуги по фрахтованию в Женеве",
+    "duration": "2 месяца",
+    "services": [
+      "Брендинг"
+    ],
+    "year": "2022",
+    "website_url": "https://www.svizraa.com/",
+    "short_description": "Презентация для партнеров, рассказывающая о бизнесе заказчика и преимуществах сотрудничества с компанией.",
+    "description": "",
+    "gallery": [
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627ae04dae29a8abe78a3034_Svizraa01.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627ae04deccb0e32c135f965_Svizraa02.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627ae04d5d317e2b7065dabb_Svizraa03.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627ae04d77e5db8f2e7f2ef7_Svizraa04.jpg"
+    ],
+    "blocks": []
+  },
+  {
+    "slug": "svizraa-",
+    "title": "Svizraa",
+    "category": "Сайты",
+    "cover_image": "/Portfolio/assets/62798ca94d23ebecbad7d197/6283967f6aacec08d1ff5bac_%D0%9E%D0%B1%D0%BB%D0%BE%D0%B6%D0%BA%D0%B0%20Svizraa2.jpg",
+    "enabled": true,
+    "specialization": "Мультимодальные перевозки, фрахтование судов, оперейтинг и бункеровка",
+    "duration": "3 месяца",
+    "services": [
+      "Структура"
+    ],
+    "year": "2023",
+    "website_url": "https://www.svizraa.com/",
+    "short_description": "Разработали сайт для привлечения новых клиентов для компании, предлагающей мульти услуги по перевозке грузов.",
+    "description": "",
+    "gallery": [
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/628397702f3b9a2582c21488_1.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6283977060e7fb7d527597a1_2.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6283977006c2918ee3c4b7ba_3.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6283977034852636b34ca8ec_4.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6283976f436cde37a31bb956_5.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/628397707b9edd60c796a64a_6.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/62839770aef969878abb9710_7.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6283976f389b5270796ebd95_8.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/62839770eb4104197c3a5611_9.jpg"
+    ],
+    "blocks": []
+  },
+  {
+    "slug": "taya-house",
+    "title": "Taya house",
+    "category": "Сайты",
+    "cover_image": "/Portfolio/assets/62798ca94d23ebecbad7d197/62798d0469ff1b02fdeb7a65_31f795129662075.6170a9f61db42.png",
+    "enabled": true,
+    "specialization": "Интернет-магазин товаров для дома",
+    "duration": "6 недель",
+    "services": [
+      "Копирайтинг"
+    ],
+    "year": "2022",
+    "website_url": "",
+    "short_description": "Дизайнерская задача – передать оформлением ощущение домашнего уюта, наглядно показать пользователю, как те или иные товары могут смотреться в его доме.",
+    "description": "",
+    "gallery": [
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/62798d03c555ee2977ff57b4_c05ea8129662075.6170a9f61acbe.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/62798d030c1c313868d9ffae_b3753e129662075.6170a9f61ef74.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/62798d03b6246842e11dcc0a_475252129662075.6170a9f61fba7.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/62798d0469ff1b02fdeb7a65_31f795129662075.6170a9f61db42.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/62798d05fbd5290e9374d4d8_153885129662075.6170a9f61f647.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/62798d032539890c69203ff3_ee1e82129662075.6170a9f61e20a.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/62798d03e691d97e5fa83002_2690a3129662075.6170a9f620ab4.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/62798d040c1c3180b2d9ffaf_2726ea129662075.6170a9f62042e.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/62798d054e8995aa620e994e_7a86a4129662075.6170a9f61c988.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/62798d04b624683f001dcc0c_4921ed129662075.6170a9f61d23d.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/62798d03ee9670b8d310b6f4_8101d6129662075.6170a9f61b47e.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/62798d05e691d91395a83017_047e24129662075.6170a9f61e9fb.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/62798d05b52679484694bb33_a34624129662075.6170a9f61bd65.png"
+    ],
+    "blocks": []
+  },
+  {
+    "slug": "the-mellows",
+    "title": "The Mellows",
+    "category": "Презентации",
+    "cover_image": "/Portfolio/assets/62798ca94d23ebecbad7d197/627f87b23bae75c890b9339a_The%20Mellows.jpg",
+    "enabled": true,
+    "specialization": "Презентация о компании. PR-агентство, комплексное продвижение брендов",
+    "duration": "2 недели",
+    "services": [
+      "Структура"
+    ],
+    "year": "2022",
+    "website_url": "",
+    "short_description": "Креативная презентация для PR-агенства отражает современный нестандартный подход компании заказчика и вызывает «вау эффект» у её клиентов.",
+    "description": "",
+    "gallery": [
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627f877f7e1c2e4660127840_Melows01.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627f87827980b616308990c8_Melows02.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627f878523033407e2b563d7_Melows03.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627f87851115e6741f38b0f0_Melows04.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627f8785a7b99b44eb676d9d_Melows05.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627f8785694dfd7d509f3ea1_Melows06.jpg",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/627f8785cf53a2a48fc12bc3_Melows07.jpg"
+    ],
+    "blocks": []
+  },
+  {
+    "slug": "torgovo-logisticheskaya-kompaniya-v-dubae",
+    "title": "PIXIS",
+    "category": "Сайты",
+    "cover_image": "/Portfolio/assets/62798ca94d23ebecbad7d197/628399661cdc44a4f2d2e4ec_%D0%9F%D1%80%D0%B5%D0%B2%D1%8C%D1%8E.jpg",
+    "enabled": true,
+    "specialization": "",
+    "duration": "2 месяца",
+    "services": [
+      "Дизайн"
+    ],
+    "year": "2022",
+    "website_url": "http://pyxistrade.com/",
+    "short_description": "Превзошли ожидания заказчика, реализовав запрос на создание визитной карточки о компании в формате многостраничного стильного сайта, который он с гордостью показывает международным клиентам.",
+    "description": "",
+    "gallery": [
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6283943b99bfd33e83080a4e_966f68130974643.618b9496ef7aa.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6283942d081a5878d59facc8_Pixis_%201.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6283942d753f8a908c6ea08e_Pixis_%202.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6283942dfd48590ed951a546_Pixis_%203.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6283942ecd9bb02c4386fc55_Pixis_%204.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6283942d392a08cd7f7b87dc_Pixis_%205.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6283942da64a178032009a6c_Pixis_%206.png",
+      "/Portfolio/assets/62798ca94d23ebecbad7d197/6283942d3485269e884c6790_Pixis_%207.png"
+    ],
+    "blocks": []
+  }
+]
