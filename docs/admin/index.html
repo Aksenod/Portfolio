@@ -1198,6 +1198,21 @@
       }
     }
 
+    // Load local fallback data
+    async function loadLocalData() {
+      try {
+        const response = await fetch('./cases_data.json');
+        if (response.ok) {
+          const data = await response.json();
+          // Add fake IDs for local data
+          return data.map((p, i) => ({ ...p, id: `local-${i}` }));
+        }
+      } catch (e) {
+        console.log('No local data available');
+      }
+      return [];
+    }
+
     // Projects CRUD
     async function loadProjects() {
       const grid = document.getElementById('projectsGrid');
@@ -1211,20 +1226,37 @@
 
       try {
         projects = await apiRequest('/admin/projects');
+        // If API returns empty, try local data
+        if (projects.length === 0) {
+          console.log('API returned empty, trying local data...');
+          projects = await loadLocalData();
+        }
         isLoading = false;
         renderProjects();
       } catch (error) {
-        console.error('Failed to load projects:', error);
+        console.error('Failed to load from API:', error.message);
+        // Fallback to local data
+        console.log('Falling back to local data...');
+        projects = await loadLocalData();
         isLoading = false;
-        projects = [];
-        grid.innerHTML = `
-          <div class="empty-state" style="grid-column: 1/-1">
-            <div class="empty-state-icon">⚠️</div>
-            <p>Не удалось загрузить кейсы</p>
-            <p style="font-size: 13px; color: #666; margin-bottom: 16px">${error.message}</p>
-            <button class="add-btn" onclick="loadProjects()">Попробовать снова</button>
-          </div>
-        `;
+
+        if (projects.length > 0) {
+          renderProjects();
+          // Show notice that we're in offline mode
+          const notice = document.createElement('div');
+          notice.style.cssText = 'background: #332200; color: #ffaa00; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; font-size: 14px;';
+          notice.innerHTML = '⚠️ Режим просмотра (API недоступен). Редактирование отключено.';
+          grid.parentElement.insertBefore(notice, grid);
+        } else {
+          grid.innerHTML = `
+            <div class="empty-state" style="grid-column: 1/-1">
+              <div class="empty-state-icon">⚠️</div>
+              <p>Не удалось загрузить кейсы</p>
+              <p style="font-size: 13px; color: #666; margin-bottom: 16px">${error.message}</p>
+              <button class="add-btn" onclick="loadProjects()">Попробовать снова</button>
+            </div>
+          `;
+        }
       }
     }
 
