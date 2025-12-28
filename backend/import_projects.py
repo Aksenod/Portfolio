@@ -66,8 +66,8 @@ def parse_project_html(project_dir: Path) -> Optional[Dict]:
 
 
 def import_projects():
-    """Import all projects from /proekty directory into database."""
-    projects_dir = Path(__file__).parent.parent / "proekty"
+    """Import all projects from /docs/proekty directory into database."""
+    projects_dir = Path(__file__).parent.parent / "docs" / "proekty"
     if not projects_dir.exists():
         print(f"Projects directory not found: {projects_dir}")
         return
