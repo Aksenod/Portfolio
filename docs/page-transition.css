@@ -1,0 +1,28 @@
+:root{--pt-dur-in:520ms;--pt-dur-out:520ms;--pt-ease:cubic-bezier(.2,.9,.1,1)}
+
+.pt-overlay{position:fixed;inset:0;z-index:2147483647;pointer-events:none;opacity:0;transition:opacity 120ms linear;background:#000}
+.pt-overlay.is-active{opacity:1;pointer-events:auto}
+
+.pt-wipe{position:absolute;inset:-10%;transform:translateY(110%);will-change:transform}
+.pt-overlay.is-enter .pt-wipe{transition:transform var(--pt-dur-out) var(--pt-ease)}
+.pt-overlay.is-exit .pt-wipe{transition:transform var(--pt-dur-in) var(--pt-ease)}
+.pt-overlay.is-enter .pt-wipe{transform:translateY(110%)}
+.pt-overlay.is-enter.is-visible .pt-wipe{transform:translateY(-10%)}
+.pt-overlay.is-exit .pt-wipe{transform:translateY(-10%)}
+.pt-overlay.is-exit.is-visible .pt-wipe{transform:translateY(-10%)}
+
+.pt-bands{position:absolute;inset:0;display:grid;grid-template-rows:repeat(10,1fr)}
+.pt-band{background:#000}
+.pt-band:nth-child(odd){background:#fff}
+.pt-band{filter:contrast(1.15)}
+
+.pt-grain{position:absolute;inset:-30%;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");mix-blend-mode:overlay;opacity:.35;animation:pt-grain 700ms steps(2) infinite}
+
+.pt-vignette{position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 45%,rgba(0,0,0,.55) 100%);mix-blend-mode:multiply;opacity:.9}
+
+@keyframes pt-grain{0%{transform:translate(0,0)}20%{transform:translate(-8%,-6%)}40%{transform:translate(7%,5%)}60%{transform:translate(-6%,8%)}80%{transform:translate(10%,-4%)}100%{transform:translate(0,0)}}
+
+@media (prefers-reduced-motion:reduce){
+  .pt-grain{animation:none}
+  .pt-overlay.is-enter .pt-wipe,.pt-overlay.is-exit .pt-wipe{transition:none}
+}
