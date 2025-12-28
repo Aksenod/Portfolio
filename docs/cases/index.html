@@ -77,11 +77,14 @@ window.__casesEnabledFix=true;
       : '/Portfolio' + (project.cover_image || '');
 
     const categoryTag = (project.category || '').toLowerCase();
+    const cleanTitle = (project.title || '').includes(', ')
+      ? (project.title || '').split(',').pop().trim()
+      : (project.title || '');
 
     card.innerHTML = `
       <div class="_4-col-grid vertical-center">
         <div class="case-year">2023</div>
-        <div class="text-23px">${project.title || ''}</div>
+        <div class="text-23px">${cleanTitle}</div>
         <div class="tag-clw">
           <div class="tag-cl">
             <div class="case-tag">${categoryTag}</div>
