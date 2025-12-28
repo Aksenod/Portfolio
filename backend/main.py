@@ -67,7 +67,7 @@ def _compute_admin_password_hash() -> str:
 ADMIN_PASSWORD_HASH = _compute_admin_password_hash()
 
 
-CategoryType = Literal["Сайты", "Презентации", "Брендинг", "Аудит", "Рекомендации", "Сервисы"]
+CategoryType = Literal["Сайты", "Презентации", "Брендинг", "Сервисы"]
 
 BlockType = Literal["hero", "text", "image", "gallery", "quote"]
 
