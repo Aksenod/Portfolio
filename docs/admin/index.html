@@ -1131,9 +1131,13 @@
       if (url.startsWith('Portfolio/')) {
         return ASSETS_BASE_URL + '/' + url;
       }
-      // Other relative paths
+      // Relative path starting with /assets/ (missing /Portfolio prefix)
+      if (url.startsWith('/assets/')) {
+        return ASSETS_BASE_URL + '/Portfolio' + url;
+      }
+      // Other relative paths starting with /
       if (url.startsWith('/')) {
-        return ASSETS_BASE_URL + url;
+        return ASSETS_BASE_URL + '/Portfolio' + url;
       }
       // Any other relative path (e.g. assets/..., images/...)
       return ASSETS_BASE_URL + '/' + url;
