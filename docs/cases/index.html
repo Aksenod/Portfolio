@@ -24,6 +24,74 @@
    transform: translateY(0);
    transition: opacity 0.35s ease, transform 0.35s ease, visibility 0s;
   }
+
+  /* Адаптивные стили для карточек кейсов */
+  @media screen and (max-width: 991px) {
+   .cases-row ._4-col-grid.vertical-center {
+    grid-template-columns: 1fr 2fr 1fr 1fr;
+   }
+   .cases-row .case-year {
+    font-size: 16px;
+   }
+   .cases-row .text-23px {
+    font-size: 18px;
+   }
+  }
+
+  @media screen and (max-width: 767px) {
+   .cases-row ._4-col-grid.vertical-center {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+   }
+   .cases-row .case-year {
+    order: 1;
+   }
+   .cases-row .text-23px:first-of-type {
+    order: 2;
+    grid-column: span 1;
+   }
+   .cases-row .tag-clw {
+    order: 3;
+   }
+   .cases-row .text-23px:last-of-type {
+    order: 4;
+   }
+  }
+
+  @media screen and (max-width: 479px) {
+   .cases-row ._4-col-grid.vertical-center {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+   }
+   .cases-row .case-year {
+    font-size: 14px;
+    opacity: 0.6;
+   }
+   .cases-row .text-23px {
+    font-size: 20px;
+    font-weight: 500;
+   }
+   .cases-row .text-23px:last-of-type {
+    display: none;
+   }
+   .cases-ci .case-image-box {
+    position: static;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1/1;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    margin-top: 12px;
+    border-radius: 16px;
+   }
+   .cases-ci {
+    padding-bottom: 20px;
+    margin-bottom: 10px;
+   }
+  }
  </style>
 
  <!-- You can remove this -->
