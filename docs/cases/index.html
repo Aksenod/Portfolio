@@ -57,22 +57,23 @@ window.__casesEnabledFix=true;
   }
 
   function createProjectCard(project) {
-    // Create card element similar to existing structure
+    // Create card element with proper Webflow structure
     const card = document.createElement('div');
-    card.className = 'cases-ci';
+    card.className = 'cases-ci w-dyn-item';
     
     card.innerHTML = `
-      <a href="/Portfolio/proekty/${project.slug}" class="case-link w-inline-block">
-        <div class="cases-image-wrap">
-          <img src="${project.cover_image.startsWith('/Portfolio/') ? project.cover_image : '/Portfolio' + project.cover_image}" loading="lazy" alt="" class="case-image">
-        </div>
-        <div class="div-block-23">
+      <div class="case-col1">
+        <div class="case-year">
           <div class="text-23px">${project.title}</div>
           <div class="filter-fields-hidden w-condition-invisible">
             <div fs-cmsfilter-field="category">${project.category}</div>
           </div>
         </div>
-      </a>
+        <div class="case-image-box" style="display: block;">
+          <img src="${project.cover_image.startsWith('/Portfolio/') ? project.cover_image : '/Portfolio' + project.cover_image}" loading="lazy" alt="" class="case-image">
+        </div>
+        <a href="/Portfolio/proekty/${project.slug}" class="case-link w-inline-block"></a>
+      </div>
     `;
     
     return card;
