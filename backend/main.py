@@ -240,7 +240,7 @@ def _import_cases_from_json() -> None:
         print("Import complete!")
 
 
-def _update_existing_projects_from_json() -> None:
+def _update_existing_projects_from_json() -> dict:
     """Update existing projects with data from JSON file (for migrations)."""
     import json
     import urllib.request
@@ -248,6 +248,10 @@ def _update_existing_projects_from_json() -> None:
 
     json_path = Path(__file__).parent / "cases_data.json"
     
+    updated_count = 0
+    created_count = 0
+    downloaded = False
+
     # Download fresh data from GitHub
     try:
         print("Downloading fresh cases_data.json from GitHub...")
@@ -257,11 +261,12 @@ def _update_existing_projects_from_json() -> None:
         with open(json_path, "w", encoding="utf-8") as f:
             f.write(response.read().decode('utf-8'))
         print("Downloaded fresh cases_data.json")
+        downloaded = True
     except Exception as e:
         print(f"Failed to download from GitHub: {e}")
         if not json_path.exists():
             print("No local cases_data.json found, skipping update")
-            return
+            return {"updated": 0, "created": 0, "downloaded": False, "reason": "no_json"}
 
     with open(json_path, "r", encoding="utf-8") as f:
         cases = json.load(f)
@@ -271,7 +276,6 @@ def _update_existing_projects_from_json() -> None:
 
     with Session(engine) as session:
         projects = session.exec(select(Project)).all()
-        updated_count = 0
 
         for project in projects:
             case_data = cases_by_slug.get(project.slug)
@@ -350,10 +354,13 @@ def _update_existing_projects_from_json() -> None:
                     blocks=case_data.get("blocks", []),
                 )
                 session.add(project)
+                created_count += 1
                 print(f"  Created: {project.title}")
             
             session.commit()
             print(f"Created {len(new_slugs)} new projects")
+
+    return {"updated": updated_count, "created": created_count, "downloaded": downloaded}
 
 
 def _migrate_database() -> None:
@@ -441,12 +448,21 @@ def _get_current_admin(credentials: HTTPAuthorizationCredentials = Depends(secur
 def health() -> dict:
     return {"ok": True, "ts": _now_utc().isoformat()}
 
+
+@app.get("/version")
+def version() -> dict:
+    import os
+    return {
+        "render_git_commit": os.getenv("RENDER_GIT_COMMIT", "unknown"),
+        "python_version": os.getenv("PYTHON_VERSION", "unknown"),
+    }
+
 @app.post("/force-update")
 def force_update() -> dict:
     """Force update all projects from JSON data"""
     try:
-        _update_existing_projects_from_json()
-        return {"status": "success", "message": "Projects updated from JSON"}
+        result = _update_existing_projects_from_json()
+        return {"status": "success", "message": "Projects updated from JSON", "result": result}
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
