@@ -106,6 +106,18 @@ class ProjectBase(SQLModel):
     category: str = "Сайты"
     cover_image: str = ""
     enabled: bool = True
+    # Metadata fields
+    specialization: str = ""  # Специализация (e.g., "Онлайн-сервис")
+    duration: str = ""  # Срок (e.g., "2 недели")
+    services: List[str] = Field(default_factory=list, sa_type=JSON)  # Услуги
+    year: str = ""  # Год
+    website_url: str = ""  # Ссылка на сайт (опционально)
+    # Content fields
+    short_description: str = ""  # Краткое описание для карточки и мета
+    description: str = ""  # Полное описание проекта (markdown)
+    # Gallery
+    gallery: List[str] = Field(default_factory=list, sa_type=JSON)  # Список URL изображений
+    # Legacy blocks (для обратной совместимости)
     blocks: List[dict] = Field(default_factory=list, sa_type=JSON)
 
 class Project(ProjectBase, table=True):
@@ -122,6 +134,18 @@ class ProjectUpdate(SQLModel):
     category: Optional[CategoryType] = None
     cover_image: Optional[str] = None
     enabled: Optional[bool] = None
+    # Metadata fields
+    specialization: Optional[str] = None
+    duration: Optional[str] = None
+    services: Optional[List[str]] = None
+    year: Optional[str] = None
+    website_url: Optional[str] = None
+    # Content fields
+    short_description: Optional[str] = None
+    description: Optional[str] = None
+    # Gallery
+    gallery: Optional[List[str]] = None
+    # Legacy blocks
     blocks: Optional[List[Block]] = None
 
 class CaseBase(SQLModel):
@@ -256,6 +280,14 @@ def create_project(
         category=body.category,
         cover_image=body.cover_image,
         enabled=body.enabled,
+        specialization=body.specialization,
+        duration=body.duration,
+        services=body.services,
+        year=body.year,
+        website_url=body.website_url,
+        short_description=body.short_description,
+        description=body.description,
+        gallery=body.gallery,
         blocks=body.blocks,
     )
     session.add(p)
