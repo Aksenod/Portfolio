@@ -245,7 +245,7 @@
                 <div class="section-core">
                   <div class="content-block mt-100 is-relative">
                     <div class="pi-title absolute-on-dt">ОПИСАНИЕ</div>
-                    <div class="text-24px">${escapeHtml(project.description).replace(/\n/g, '<br><br>')}</div>
+                    <div class="text-45px">${escapeHtml(project.description).replace(/\n\n/g, '<br/><br/>').replace(/\n/g, ' ')}</div>
                   </div>
                 </div>
               </div>
