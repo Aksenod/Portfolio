@@ -240,6 +240,74 @@ def _import_cases_from_json() -> None:
         print("Import complete!")
 
 
+def _update_existing_projects_from_json() -> None:
+    """Update existing projects with data from JSON file (for migrations)."""
+    import json
+    from pathlib import Path
+
+    json_path = Path(__file__).parent / "cases_data.json"
+    if not json_path.exists():
+        print("No cases_data.json found, skipping update")
+        return
+
+    with open(json_path, "r", encoding="utf-8") as f:
+        cases = json.load(f)
+
+    # Create a lookup by slug
+    cases_by_slug = {c["slug"]: c for c in cases}
+
+    with Session(engine) as session:
+        projects = session.exec(select(Project)).all()
+        updated_count = 0
+
+        for project in projects:
+            case_data = cases_by_slug.get(project.slug)
+            if not case_data:
+                continue
+
+            # Check if project needs updating (has empty metadata fields)
+            needs_update = (
+                not project.specialization and case_data.get("specialization") or
+                not project.duration and case_data.get("duration") or
+                not project.services and case_data.get("services") or
+                not project.year and case_data.get("year") or
+                not project.short_description and case_data.get("short_description") or
+                not project.gallery and case_data.get("gallery")
+            )
+
+            if needs_update:
+                # Update fields that are empty but have data in JSON
+                if not project.specialization:
+                    project.specialization = case_data.get("specialization", "")
+                if not project.duration:
+                    project.duration = case_data.get("duration", "")
+                if not project.services:
+                    project.services = case_data.get("services", [])
+                if not project.year:
+                    project.year = case_data.get("year", "")
+                if not project.website_url:
+                    project.website_url = case_data.get("website_url", "")
+                if not project.short_description:
+                    project.short_description = case_data.get("short_description", "")
+                if not project.description:
+                    project.description = case_data.get("description", "")
+                if not project.gallery:
+                    project.gallery = case_data.get("gallery", [])
+                if not project.cover_image:
+                    project.cover_image = case_data.get("cover_image", "")
+
+                project.updated_at = _now_utc()
+                session.add(project)
+                updated_count += 1
+                print(f"  Updated: {project.title}")
+
+        if updated_count > 0:
+            session.commit()
+            print(f"Updated {updated_count} projects with data from JSON")
+        else:
+            print("All projects already have complete data")
+
+
 def _migrate_database() -> None:
     """Add missing columns to existing tables for SQLite compatibility."""
     from sqlalchemy import inspect, text
@@ -281,7 +349,9 @@ def _startup() -> None:
     _migrate_database()
     # Then create any new tables
     SQLModel.metadata.create_all(engine)
+    # Import new cases or update existing ones with data from JSON
     _import_cases_from_json()
+    _update_existing_projects_from_json()
 
 
 def get_session():
