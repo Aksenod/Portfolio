@@ -241,6 +241,18 @@
           
           ${galleryHtml}
           
+          ${project.description ? `
+            <section class="section-new">
+              <div class="container-new">
+                <div class="section-core">
+                  <div class="content-block mt-100">
+                    <div class="text-45px">${escapeHtml(project.description)}</div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          ` : ''}
+          
           <section id="footer" class="section-new footer-section">
             <div class="footer-scroll-text-row">
               <div class="footer-scroll-text-wrap">
