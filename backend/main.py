@@ -1,15 +1,18 @@
 import os
 import uuid
+import base64
+import hashlib
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Union
 
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, status, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlmodel import Field, Session, SQLModel, create_engine, select, JSON
 from typing import List, Literal
+import httpx
 
 JWT_ALGORITHM = "HS256"
 
@@ -473,6 +476,86 @@ def login(body: LoginRequest) -> TokenResponse:
 
     token = _create_access_token(body.username)
     return TokenResponse(access_token=token)
+
+
+@app.post("/admin/upload")
+async def upload_image(
+    file: UploadFile = File(...),
+    _admin: str = Depends(_get_current_admin)
+) -> dict:
+    """Upload image to GitHub repository"""
+
+    # Validate file type
+    if not file.content_type or not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File must be an image")
+
+    # Read file content
+    content = await file.read()
+
+    # Validate file size (max 5MB)
+    max_size = 5 * 1024 * 1024  # 5MB
+    if len(content) > max_size:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File too large (max 5MB)")
+
+    # Generate unique filename
+    file_hash = hashlib.md5(content).hexdigest()[:12]
+    ext = file.filename.split(".")[-1] if "." in file.filename else "jpg"
+    filename = f"{file_hash}.{ext}"
+
+    # GitHub API setup
+    github_token = os.getenv("GITHUB_TOKEN")
+    if not github_token:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                          detail="GitHub token not configured")
+
+    github_owner = os.getenv("GITHUB_OWNER", "Aksenod")
+    github_repo = os.getenv("GITHUB_REPO", "Portfolio")
+    file_path = f"docs/assets/uploads/{filename}"
+
+    # Encode content to base64
+    content_base64 = base64.b64encode(content).decode("utf-8")
+
+    # Check if file already exists (to get SHA for update)
+    url = f"https://api.github.com/repos/{github_owner}/{github_repo}/contents/{file_path}"
+    headers = {
+        "Authorization": f"Bearer {github_token}",
+        "Accept": "application/vnd.github.v3+json",
+    }
+
+    async with httpx.AsyncClient() as client:
+        # Try to get existing file
+        get_response = await client.get(url, headers=headers)
+        sha = None
+        if get_response.status_code == 200:
+            sha = get_response.json().get("sha")
+
+        # Upload file
+        commit_message = f"Upload image: {filename}"
+        payload = {
+            "message": commit_message,
+            "content": content_base64,
+        }
+        if sha:
+            payload["sha"] = sha
+
+        put_response = await client.put(url, headers=headers, json=payload)
+
+        if put_response.status_code not in [200, 201]:
+            error_detail = put_response.json().get("message", "Unknown error")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"GitHub upload failed: {error_detail}"
+            )
+
+        # Return URL
+        github_pages_base = os.getenv("GITHUB_PAGES_BASE", "https://aksenod.github.io")
+        image_url = f"{github_pages_base}/Portfolio/assets/uploads/{filename}"
+
+        return {
+            "url": image_url,
+            "filename": filename,
+            "size": len(content),
+        }
 
 
 @app.get("/projects", response_model=list[Project])
