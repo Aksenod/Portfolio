@@ -1,4 +1,5 @@
 import os
+import io
 import uuid
 import base64
 import hashlib
@@ -13,6 +14,7 @@ from passlib.context import CryptContext
 from sqlmodel import Field, Session, SQLModel, create_engine, select, JSON
 from typing import List, Literal
 import httpx
+from PIL import Image
 
 JWT_ALGORITHM = "HS256"
 
@@ -478,12 +480,30 @@ def login(body: LoginRequest) -> TokenResponse:
     return TokenResponse(access_token=token)
 
 
+def convert_to_webp(content: bytes, quality: int = 85) -> bytes:
+    """Convert image to WebP format"""
+    img = Image.open(io.BytesIO(content))
+
+    # Convert to RGB if necessary (for PNG with transparency, use RGBA)
+    if img.mode in ('RGBA', 'LA') or (img.mode == 'P' and 'transparency' in img.info):
+        # Keep alpha channel for transparent images
+        img = img.convert('RGBA')
+    else:
+        img = img.convert('RGB')
+
+    # Save as WebP
+    output = io.BytesIO()
+    img.save(output, format='WEBP', quality=quality, method=6)
+    output.seek(0)
+    return output.read()
+
+
 @app.post("/admin/upload")
 async def upload_image(
     file: UploadFile = File(...),
     _admin: str = Depends(_get_current_admin)
 ) -> dict:
-    """Upload image to GitHub repository"""
+    """Upload image to GitHub repository, automatically converting to WebP"""
 
     # Validate file type
     if not file.content_type or not file.content_type.startswith("image/"):
@@ -492,15 +512,20 @@ async def upload_image(
     # Read file content
     content = await file.read()
 
-    # Validate file size (max 5MB)
-    max_size = 5 * 1024 * 1024  # 5MB
+    # Validate file size (max 10MB for original, will be smaller after WebP conversion)
+    max_size = 10 * 1024 * 1024  # 10MB
     if len(content) > max_size:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File too large (max 5MB)")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File too large (max 10MB)")
 
-    # Generate unique filename
-    file_hash = hashlib.md5(content).hexdigest()[:12]
-    ext = file.filename.split(".")[-1] if "." in file.filename else "jpg"
-    filename = f"{file_hash}.{ext}"
+    # Convert to WebP format
+    try:
+        webp_content = convert_to_webp(content)
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Failed to process image: {str(e)}")
+
+    # Generate unique filename with .webp extension
+    file_hash = hashlib.md5(webp_content).hexdigest()[:12]
+    filename = f"{file_hash}.webp"
 
     # GitHub API setup
     github_token = os.getenv("GITHUB_TOKEN")
@@ -512,8 +537,8 @@ async def upload_image(
     github_repo = os.getenv("GITHUB_REPO", "Portfolio")
     file_path = f"docs/assets/uploads/{filename}"
 
-    # Encode content to base64
-    content_base64 = base64.b64encode(content).decode("utf-8")
+    # Encode WebP content to base64
+    content_base64 = base64.b64encode(webp_content).decode("utf-8")
 
     # Check if file already exists (to get SHA for update)
     url = f"https://api.github.com/repos/{github_owner}/{github_repo}/contents/{file_path}"
@@ -554,7 +579,9 @@ async def upload_image(
         return {
             "url": image_url,
             "filename": filename,
-            "size": len(content),
+            "size": len(webp_content),
+            "original_size": len(content),
+            "format": "webp",
         }
 
 
