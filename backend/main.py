@@ -547,9 +547,9 @@ async def upload_image(
                 detail=f"GitHub upload failed: {error_detail}"
             )
 
-        # Return URL
-        github_pages_base = os.getenv("GITHUB_PAGES_BASE", "https://aksenod.github.io")
-        image_url = f"{github_pages_base}/Portfolio/assets/uploads/{filename}"
+        # Return URL - use raw.githubusercontent.com for instant availability
+        # GitHub Pages can take 1-3 minutes to deploy, but raw URLs work immediately
+        image_url = f"https://raw.githubusercontent.com/{github_owner}/{github_repo}/main/docs/assets/uploads/{filename}"
 
         return {
             "url": image_url,
