@@ -65,16 +65,22 @@
   }
 
   // Generate slide HTML
-  function createSlideHTML(project) {
+  function createSlideHTML(project, index) {
     const imageUrl = normalizeImageUrl(project.cover_image);
     const projectUrl = `/Portfolio/proekty/${project.slug}`;
+
+    // First 3 images load eagerly for better LCP, rest lazy load
+    const loadingAttr = index < 3 ? 'eager' : 'lazy';
+    const fetchPriority = index === 0 ? 'high' : 'auto';
 
     return `
       <div role="listitem" class="hero-cli w-dyn-item">
         <div class="hero-slider-card">
           <div class="hero-slide-inner">
             <a href="${projectUrl}" class="image-wrap w-inline-block">
-              <img loading="lazy"
+              <img loading="${loadingAttr}"
+                   decoding="async"
+                   fetchpriority="${fetchPriority}"
                    width="70"
                    alt="${project.title}"
                    src="${imageUrl}"
@@ -92,6 +98,19 @@
         </div>
       </div>
     `;
+  }
+
+  // Preload first image for faster LCP
+  function preloadFirstImage(projects) {
+    if (projects.length > 0) {
+      const firstImageUrl = normalizeImageUrl(projects[0].cover_image);
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = firstImageUrl;
+      link.type = 'image/webp';
+      document.head.appendChild(link);
+    }
   }
 
   // Initialize slider
@@ -117,8 +136,8 @@
     }
 
     // Add all project slides
-    projects.forEach(project => {
-      container.insertAdjacentHTML('beforeend', createSlideHTML(project));
+    projects.forEach((project, index) => {
+      container.insertAdjacentHTML('beforeend', createSlideHTML(project, index));
     });
 
     // Reinitialize Webflow slider
@@ -136,6 +155,7 @@
     console.log('Initializing projects slider...');
 
     const projects = await loadProjects();
+    preloadFirstImage(projects);
     initSlider(projects);
   }
 
