@@ -8,10 +8,19 @@
   const API_BASE = window.__API_BASE || 'https://portfolio-backend-qm04.onrender.com';
   const ASSETS_BASE_URL = 'https://aksenod.github.io';
 
+  // Convert legacy image extensions to WebP
+  function toWebP(url) {
+    if (!url) return url;
+    return url.replace(/\.(jpg|jpeg|png|JPG|JPEG|PNG)$/i, '.webp');
+  }
+
   // Normalize image URL - convert relative paths to absolute
   function normalizeImageUrl(url) {
     if (!url) return '';
     url = String(url).trim();
+
+    // Convert to WebP format
+    url = toWebP(url);
 
     // Already absolute URL
     if (url.startsWith('http://') || url.startsWith('https://')) {
