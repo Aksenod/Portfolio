@@ -78,6 +78,7 @@
                    width="70"
                    alt="${project.title}"
                    src="${imageUrl}"
+                   onerror="this.style.display='none'; console.error('Failed to load image for ${project.title}:', '${imageUrl}');"
                    class="image-cover"/>
             </a>
             <div class="cs-label">
@@ -118,6 +119,7 @@
 
     // Add all project slides
     projects.forEach(project => {
+      console.log(`Adding slide: ${project.title}, image: ${normalizeImageUrl(project.cover_image)}`);
       container.insertAdjacentHTML('beforeend', createSlideHTML(project));
     });
 
@@ -128,7 +130,7 @@
       window.Webflow.require('slider').redraw();
     }
 
-    console.log(`Loaded ${projects.length} projects into slider`);
+    console.log(`✓ Loaded ${projects.length} projects into slider`);
   }
 
   // Main initialization
