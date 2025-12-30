@@ -138,13 +138,18 @@ window.__casesEnabledFix=true;
       ? projects.filter(p => p.category === currentFilter)
       : projects;
 
+    // Compute category index for each project
+    const categoryCounters = {};
     filteredProjects.forEach(project => {
-      const card = createProjectCard(project);
+      const cat = project.category || 'Other';
+      categoryCounters[cat] = (categoryCounters[cat] || 0) + 1;
+      const categoryIndex = categoryCounters[cat];
+      const card = createProjectCard(project, categoryIndex);
       cardsContainer.appendChild(card);
     });
   }
 
-  function createProjectCard(project) {
+  function createProjectCard(project, categoryIndex) {
     const card = document.createElement('div');
     card.className = 'service-row cases-row cases-ci w-dyn-item';
 
@@ -157,16 +162,18 @@ window.__casesEnabledFix=true;
       ? (project.title || '').split(',').pop().trim()
       : (project.title || '');
 
+    const projectYear = project.year || '2023';
+
     card.innerHTML = `
       <div class="_4-col-grid vertical-center">
-        <div class="case-year">2023</div>
+        <div class="case-year">${projectYear}</div>
         <div class="text-23px">${cleanTitle}</div>
         <div class="tag-clw">
           <div class="tag-cl">
             <div class="case-tag">${categoryTag}</div>
           </div>
         </div>
-        <div class="text-23px">Figma</div>
+        <div class="text-23px">${categoryIndex}</div>
       </div>
       <div class="case-image-box">
         <img src="${cover}" loading="lazy" alt="" class="case-image">
