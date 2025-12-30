@@ -136,8 +136,21 @@
   // Main initialization
   async function init() {
     console.log('Initializing projects slider...');
+    console.log('API_BASE:', API_BASE);
+    console.log('ASSETS_BASE_URL:', ASSETS_BASE_URL);
 
     const projects = await loadProjects();
+    console.log('Loaded projects:', projects.length);
+
+    if (projects.length > 0) {
+      console.log('First project:', {
+        title: projects[0].title,
+        slug: projects[0].slug,
+        cover_image: projects[0].cover_image,
+        normalized_url: normalizeImageUrl(projects[0].cover_image)
+      });
+    }
+
     initSlider(projects);
   }
 
