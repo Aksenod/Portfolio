@@ -124,36 +124,66 @@
 
   // Initialize slider
   function initSlider(projects) {
-    const container = document.querySelector('.hero-cl.w-dyn-items');
+    // Try Webflow slider mask first (direct injection)
+    const sliderMask = document.querySelector('.hero-slider-mask');
+    const cmsContainer = document.querySelector('.hero-cl.w-dyn-items');
 
-    if (!container) {
+    if (!sliderMask && !cmsContainer) {
       console.error('Slider container not found');
       return;
     }
 
-    // Clear loading state
-    container.innerHTML = '';
-
     // Generate slides
     if (projects.length === 0) {
-      container.innerHTML = `
-        <div class="hero-cli" style="padding: 40px; text-align: center; color: #888;">
-          <p>Проекты загружаются...</p>
-        </div>
-      `;
+      console.log('No projects to display');
       return;
     }
 
-    // Add all project slides
-    projects.forEach((project, index) => {
-      container.insertAdjacentHTML('beforeend', createSlideHTML(project, index));
-    });
+    // Add slides directly to Webflow slider mask
+    if (sliderMask) {
+      // Clear existing slides
+      sliderMask.innerHTML = '';
 
-    // Reinitialize Webflow slider
-    if (window.Webflow) {
-      window.Webflow.destroy();
-      window.Webflow.ready();
-      window.Webflow.require('slider').redraw();
+      projects.forEach((project, index) => {
+        const imageUrl = normalizeImageUrl(project.cover_image);
+        const projectUrl = `/Portfolio/proekty/${project.slug}`;
+        const loadingAttr = index < 3 ? 'eager' : 'lazy';
+
+        const slide = document.createElement('div');
+        slide.className = 'hero-slide w-slide';
+        slide.innerHTML = `
+          <a href="${projectUrl}" class="hero-slide-link w-inline-block">
+            <div class="hero-slide-inner">
+              <img loading="${loadingAttr}"
+                   decoding="async"
+                   alt="${project.title}"
+                   src="${imageUrl}"
+                   class="hero-slide-image"/>
+              <div class="hero-slide-overlay"></div>
+              <div class="hero-slide-content">
+                <div class="hero-slide-category">${project.category || ''}</div>
+                <div class="hero-slide-title">${project.title}</div>
+              </div>
+            </div>
+          </a>
+        `;
+        sliderMask.appendChild(slide);
+      });
+
+      // Reinitialize Webflow slider
+      if (window.Webflow) {
+        window.Webflow.destroy();
+        window.Webflow.ready();
+        window.Webflow.require('slider').redraw();
+      }
+    }
+
+    // Also populate CMS container for Finsweet (fallback)
+    if (cmsContainer) {
+      cmsContainer.innerHTML = '';
+      projects.forEach((project, index) => {
+        cmsContainer.insertAdjacentHTML('beforeend', createSlideHTML(project, index));
+      });
     }
 
     console.log(`Loaded ${projects.length} projects into slider`);
