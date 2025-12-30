@@ -12,12 +12,12 @@
    position: relative;
   }
   .cases-ci .case-image-box {
-   display: block;
+   display: block !important;
    position: absolute;
    opacity: 0;
    visibility: hidden;
    pointer-events: none;
-   transform: translateY(10px);
+   transform: translateY(10px) scale(0.95);
    transition: opacity 0.35s ease, transform 0.35s ease, visibility 0s linear 0.35s;
    left: 52.2%;
    top: 0;
@@ -25,9 +25,9 @@
    z-index: 10;
   }
   .cases-ci:hover .case-image-box {
-   opacity: 1;
-   visibility: visible;
-   transform: translateY(0);
+   opacity: 1 !important;
+   visibility: visible !important;
+   transform: translateY(0) scale(1);
    transition: opacity 0.35s ease, transform 0.35s ease, visibility 0s;
   }
 
@@ -148,6 +148,19 @@ window.__casesEnabledFix=true;
       const card = createProjectCard(project);
       cardsContainer.appendChild(card);
     });
+
+    // Reinitialize Webflow IX2 animations for dynamically created elements
+    if (window.Webflow) {
+      window.Webflow.destroy();
+      window.Webflow.ready();
+      if (window.Webflow.require) {
+        try {
+          window.Webflow.require('ix2').init();
+        } catch (e) {
+          console.log('IX2 reinit skipped');
+        }
+      }
+    }
   }
 
   function createProjectCard(project) {
