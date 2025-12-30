@@ -115,6 +115,12 @@ window.__casesEnabledFix=true;
   let projects = [];
   let currentFilter = null;
 
+  // Convert legacy image extensions to WebP
+  function toWebP(url) {
+    if (!url) return url;
+    return url.replace(/\.(jpg|jpeg|png|JPG|JPEG|PNG)$/i, '.webp');
+  }
+
   async function loadProjects() {
     try {
       const response = await fetch(`${API_BASE}/projects`);
@@ -148,9 +154,10 @@ window.__casesEnabledFix=true;
     const card = document.createElement('div');
     card.className = 'service-row cases-row cases-ci w-dyn-item';
 
-    const cover = project.cover_image && project.cover_image.startsWith('/Portfolio/')
+    let cover = project.cover_image && project.cover_image.startsWith('/Portfolio/')
       ? project.cover_image
       : '/Portfolio' + (project.cover_image || '');
+    cover = toWebP(cover);
 
     const categoryTag = (project.category || '').toLowerCase();
     const cleanTitle = (project.title || '').includes(', ')
