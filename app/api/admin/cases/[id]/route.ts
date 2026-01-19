@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { readCase, writeCase, deleteCase, findCaseByIdOrSlug } from '@/lib/api/storage';
+import { readCase, writeCase, deleteCase, findCaseByIdOrSlug, readAllCases } from '@/lib/api/storage';
 import type { ApiResponse, Case } from '@/lib/api/types';
+import { generateSlug, generateUniqueSlug } from '@/lib/utils/slug';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -62,7 +63,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
     }
 
     // Валидация обязательных полей
-    if (!body.title || !body.slug || !body.year || !body.techStack || body.techStack.length === 0) {
+    if (!body.title || !body.year || !body.techStack || body.techStack.length === 0) {
       const response: ApiResponse<null> = {
         success: false,
         error: 'Заполните все обязательные поля',
@@ -70,8 +71,24 @@ export async function PUT(request: Request, { params }: RouteParams) {
       return NextResponse.json(response, { status: 400 });
     }
 
+    // Автоматическая генерация slug, если не указан
+    let finalSlug = body.slug?.trim() || existingCase.slug || '';
+    if (!finalSlug && body.title) {
+      const allCases = readAllCases();
+      const existingSlugs = allCases.filter(c => c.id !== existingCase.id).map(c => c.slug);
+      finalSlug = generateUniqueSlug(body.title, existingSlugs);
+    }
+
+    if (!finalSlug) {
+      const response: ApiResponse<null> = {
+        success: false,
+        error: 'Не удалось сгенерировать slug. Укажите slug вручную.',
+      };
+      return NextResponse.json(response, { status: 400 });
+    }
+
     // Если slug изменился, проверяем, не занят ли новый slug
-    if (body.slug !== existingCase.slug && readCase(body.slug)) {
+    if (finalSlug !== existingCase.slug && readCase(finalSlug)) {
       const response: ApiResponse<null> = {
         success: false,
         error: 'Кейс с таким slug уже существует',
@@ -84,6 +101,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
       ...existingCase,
       ...body,
       id: existingCase.id, // Сохраняем оригинальный ID
+      slug: finalSlug, // Используем сгенерированный или указанный slug
       updatedAt: new Date().toISOString(),
     };
 

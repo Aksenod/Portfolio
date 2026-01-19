@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import type { Case } from '@/lib/api/types';
 import { ImageUpload } from '@/components/admin/ImageUpload';
 import { getBasePath } from '@/lib/utils/paths';
+import { generateSlug } from '@/lib/utils/slug';
 
 type ViewMode = 'list' | 'create' | 'edit';
 
@@ -219,7 +220,8 @@ export default function AdminPage() {
 
   // Валидация для опубликованных кейсов
   const validatePublishedCase = (): string | null => {
-    if (!formData.title || !formData.slug || !formData.year || !formData.techStack || formData.techStack.length === 0 || !formData.previewImage || !formData.heroImage) {
+    // Slug теперь генерируется автоматически, поэтому не проверяем его
+    if (!formData.title || !formData.year || !formData.techStack || formData.techStack.length === 0 || !formData.previewImage || !formData.heroImage) {
       return 'Заполните все обязательные поля';
     }
 
@@ -352,7 +354,13 @@ export default function AdminPage() {
                 <input
                   type="text"
                   value={formData.title || ''}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  onChange={(e) => {
+                    const newTitle = e.target.value;
+                    // Автоматически генерируем slug в режиме создания или если slug пустой в режиме редактирования
+                    const shouldGenerateSlug = (!editingCase || !formData.slug) && newTitle;
+                    const newSlug = shouldGenerateSlug ? generateSlug(newTitle) : formData.slug || '';
+                    setFormData({ ...formData, title: newTitle, slug: newSlug });
+                  }}
                   className="w-full bg-base-secondary border border-border-base/20 px-4 py-3 rounded text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-focus-ring/50 focus:border-accent transition-colors"
                   required={formData.published}
                 />
@@ -361,12 +369,18 @@ export default function AdminPage() {
               <div>
                 <label className="block text-foreground/80 text-sm font-medium mb-2">
                   Slug (URL) {formData.published && '*'}
+                  <span className="text-foreground/40 text-xs font-normal ml-2">
+                    {!editingCase ? '(генерируется автоматически)' : '(можно изменить)'}
+                  </span>
                 </label>
                 <input
                   type="text"
                   value={formData.slug || ''}
                   onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  className="w-full bg-base-secondary border border-border-base/20 px-4 py-3 rounded text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-focus-ring/50 focus:border-accent transition-colors"
+                  readOnly={!editingCase}
+                  className={`w-full bg-base-secondary border border-border-base/20 px-4 py-3 rounded text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-focus-ring/50 focus:border-accent transition-colors ${
+                    !editingCase ? 'cursor-not-allowed opacity-70' : ''
+                  }`}
                   placeholder="project-name-2024"
                   required={formData.published}
                 />
@@ -636,7 +650,7 @@ export default function AdminPage() {
           <div className="space-y-4">
             {cases.map((caseItem) => (
               <div
-                key={caseItem.id}
+                key={`case-${caseItem.id}`}
                 className="border border-border-base/20 p-6 rounded bg-base-secondary hover:bg-base-secondary/80 transition-colors"
               >
                 <div className="flex items-start justify-between">

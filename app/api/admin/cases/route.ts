@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { readAllCases, writeCase, slugExists } from '@/lib/api/storage';
 import type { ApiResponse, Case } from '@/lib/api/types';
+import { generateSlug, generateUniqueSlug } from '@/lib/utils/slug';
 
 /**
  * GET /api/admin/cases
@@ -38,7 +39,7 @@ export async function POST(request: Request) {
     const body: Partial<Case> = await request.json();
 
     // Валидация обязательных полей
-    if (!body.title || !body.slug || !body.year || !body.techStack || body.techStack.length === 0) {
+    if (!body.title || !body.year || !body.techStack || body.techStack.length === 0) {
       const response: ApiResponse<null> = {
         success: false,
         error: 'Заполните все обязательные поля',
@@ -46,8 +47,24 @@ export async function POST(request: Request) {
       return NextResponse.json(response, { status: 400 });
     }
 
+    // Автоматическая генерация slug, если не указан
+    let finalSlug = body.slug?.trim() || '';
+    if (!finalSlug && body.title) {
+      const allCases = readAllCases();
+      const existingSlugs = allCases.map(c => c.slug);
+      finalSlug = generateUniqueSlug(body.title, existingSlugs);
+    }
+
+    if (!finalSlug) {
+      const response: ApiResponse<null> = {
+        success: false,
+        error: 'Не удалось сгенерировать slug. Укажите slug вручную.',
+      };
+      return NextResponse.json(response, { status: 400 });
+    }
+
     // Проверка на существующий slug
-    if (slugExists(body.slug)) {
+    if (slugExists(finalSlug)) {
       const response: ApiResponse<null> = {
         success: false,
         error: 'Кейс с таким slug уже существует',
@@ -59,7 +76,7 @@ export async function POST(request: Request) {
     const now = new Date().toISOString();
     const newCase: Case = {
       id: body.id || `case-${Date.now()}`,
-      slug: body.slug,
+      slug: finalSlug,
       title: body.title,
       year: body.year,
       techStack: body.techStack,
