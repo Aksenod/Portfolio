@@ -36,9 +36,10 @@ export function ImageUpload({
   };
 
   // Генерируем URL из имени файла
+  // Примечание: API автоматически конвертирует все изображения в WebP,
+  // поэтому эта функция используется только для предварительного отображения
   const generateUrlFromFileName = (fileName: string): string => {
     // Убираем расширение
-    const ext = fileName.substring(fileName.lastIndexOf('.'));
     const baseName = fileName.substring(0, fileName.lastIndexOf('.'));
     
     // Очищаем имя файла
@@ -48,7 +49,8 @@ export function ImageUpload({
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, '');
     
-    return `/images/${cleanName}${ext}`;
+    // Всегда используем расширение .webp, так как API конвертирует в WebP
+    return `/images/${cleanName}.webp`;
   };
 
   const handleFile = async (file: File) => {
@@ -227,7 +229,7 @@ export function ImageUpload({
                   Перетащите изображение сюда или нажмите для выбора
                 </div>
                 <div className="text-foreground/40 text-xs">
-                  JPEG, PNG, WebP, GIF (макс. 10MB)
+                  JPEG, PNG, WebP, GIF (макс. 10MB, автоматически конвертируется в WebP)
                 </div>
               </>
             )}
@@ -267,7 +269,7 @@ export function ImageUpload({
         )}
         {value && (
           <div className="mt-2 text-xs text-foreground/60">
-            URL будет автоматически сгенерирован из имени файла при загрузке
+            URL будет автоматически сгенерирован из имени файла при загрузке. Изображение будет конвертировано в WebP для оптимизации.
           </div>
         )}
       </div>
