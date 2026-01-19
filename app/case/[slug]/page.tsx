@@ -9,13 +9,17 @@ interface CasePageProps {
 export async function generateStaticParams() {
   const cases = getAllPublishedCases();
   return cases.map((caseItem) => ({
+    // Next.js автоматически кодирует slug при генерации статических путей
     slug: caseItem.slug,
   }));
 }
 
 export default async function CasePage({ params }: CasePageProps) {
   const { slug } = await params;
-  const caseData = getCaseBySlug(slug);
+  // Next.js автоматически декодирует параметры маршрута
+  // Но для надежности декодируем явно, особенно для пробелов и спецсимволов
+  const decodedSlug = decodeURIComponent(slug);
+  const caseData = getCaseBySlug(decodedSlug);
 
   return <CasePageClient caseData={caseData} />;
 }

@@ -1,6 +1,6 @@
 {
   "id": "c3d4e5f6-a7b8-9012-cdef-345678901234",
-  "slug": "CMT consulting",
+  "slug": "CMT_consulting",
   "title": "CMT consulting",
   "year": 2023,
   "techStack": [
@@ -12,17 +12,17 @@
     "FastAPI"
   ],
   "previewImage": "/images/rectangle-41084.png",
-  "heroImage": "/images/cover.webp",
+  "heroImage": "/images/cover.jpg",
   "caseType": "Dashboard",
   "screenshotBlocks": [
     {
       "title": "Главная страница",
       "images": [
-        "/images/image-1768847630578.webp"
+        "/images/image-1768808820041.jpg"
       ]
     }
   ],
   "published": true,
   "createdAt": "2023-11-10T09:15:00.000Z",
-  "updatedAt": "2026-01-19T18:33:54.690Z"
+  "updatedAt": "2026-01-19T18:28:39.060Z"
 }

@@ -128,17 +128,6 @@ export function Header() {
             Portfolio
           </TransitionLink>
           <TransitionLink
-            href="/case"
-            onNavigate={navigate}
-            className={`text-base font-medium pointer-events-auto transition-colors focus:text-foreground focus:outline-none ${
-              pathname === '/case' 
-                ? 'text-foreground' 
-                : 'text-foreground/80 hover:text-foreground'
-            }`}
-          >
-            Кейс
-          </TransitionLink>
-          <TransitionLink
             href="/ui-kit"
             onNavigate={navigate}
             className={`text-base font-medium pointer-events-auto transition-colors focus:text-foreground focus:outline-none ${
@@ -209,18 +198,6 @@ export function Header() {
               }`}
             >
               Portfolio
-            </TransitionLink>
-            <TransitionLink
-              href="/case"
-              onNavigate={navigate}
-              onClick={handleLinkClick}
-              className={`w-full text-lg font-medium py-6 px-6 rounded transition-colors focus:text-foreground focus:outline-none hover:bg-base ${
-                pathname === '/case' 
-                  ? 'text-foreground' 
-                  : 'text-foreground/80 hover:text-foreground'
-              }`}
-            >
-              Кейс
             </TransitionLink>
             <TransitionLink
               href="/ui-kit"

@@ -2,15 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Craftwork Grotesk Font Family */
-@font-face {
-  font-family: 'Craftwork Grotesk';
-  src: url('/fonts/CraftworkGrotesk-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
 /* Скрытие скроллбара */
 @layer utilities {
   .scrollbar-hide {
@@ -23,43 +14,10 @@
   }
 }
 
-@font-face {
-  font-family: 'Craftwork Grotesk';
-  src: url('/fonts/CraftworkGrotesk-Medium.ttf') format('truetype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Craftwork Grotesk';
-  src: url('/fonts/CraftworkGrotesk-SemiBold.ttf') format('truetype');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Craftwork Grotesk';
-  src: url('/fonts/CraftworkGrotesk-Bold.ttf') format('truetype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Craftwork Grotesk';
-  src: url('/fonts/CraftworkGrotesk-Heavy.ttf') format('truetype');
-  font-weight: 900;
-  font-style: normal;
-  font-display: swap;
-}
-
 html,
 body {
   height: 100%;
   width: 100%;
-  font-family: 'Craftwork Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   overscroll-behavior: none; /* Предотвращает bounce-эффект при достижении конца страницы */
   overscroll-behavior-y: none; /* Дополнительно для вертикального скролла */
 }

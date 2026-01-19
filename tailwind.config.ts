@@ -33,8 +33,8 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Craftwork Grotesk', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
-        'craftwork': ['Craftwork Grotesk', 'sans-serif'],
+        sans: ['var(--font-craftwork)', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        'craftwork': ['var(--font-craftwork)', 'sans-serif'],
       },
       colors: colors,
     },

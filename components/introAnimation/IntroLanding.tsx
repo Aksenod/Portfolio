@@ -164,20 +164,56 @@ export default function IntroLanding({ images, heading, counterText = 'Loading',
       
       const images = imageRefs.current;
       const checkImagesLoaded = () => {
-        return images.every((img) => img?.complete);
+        return images.every((img) => {
+          if (!img) return false;
+          // Проверяем, что изображение загружено (complete) и имеет размеры
+          return img.complete && img.naturalWidth > 0 && img.naturalHeight > 0;
+        });
       };
 
       if (checkImagesLoaded()) {
         setFinalState();
       } else {
         const imageLoadPromises = images.map((img) => {
-          if (!img || img.complete) {
+          if (!img) {
             return Promise.resolve();
           }
+          
+          // Если изображение уже загружено (из кэша), проверяем размеры
+          if (img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {
+            return Promise.resolve();
+          }
+          
           return new Promise<void>((resolve) => {
-            img.onload = () => resolve();
-            img.onerror = () => resolve();
-            setTimeout(() => resolve(), 10000);
+            const handleLoad = () => {
+              // Проверяем, что изображение действительно загружено
+              if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+                resolve();
+              } else {
+                // Если размеры не определены, все равно продолжаем
+                resolve();
+              }
+            };
+            
+            const handleError = () => {
+              // Продолжаем даже при ошибке
+              resolve();
+            };
+            
+            // Если изображение уже загружено, но событие уже произошло
+            if (img.complete) {
+              handleLoad();
+              return;
+            }
+            
+            img.addEventListener('load', handleLoad, { once: true });
+            img.addEventListener('error', handleError, { once: true });
+            
+            setTimeout(() => {
+              img.removeEventListener('load', handleLoad);
+              img.removeEventListener('error', handleError);
+              resolve();
+            }, 10000);
           });
         });
         Promise.all(imageLoadPromises).then(() => {
@@ -552,28 +588,73 @@ export default function IntroLanding({ images, heading, counterText = 'Loading',
 
     // Ждём загрузки всех изображений
     const checkImagesLoaded = () => {
-      return imageRefs.current.every((img) => img?.complete);
+      return imageRefs.current.every((img) => {
+        if (!img) return false;
+        // Проверяем, что изображение загружено (complete) и имеет размеры
+        // Это важно для изображений из кэша браузера
+        return img.complete && img.naturalWidth > 0 && img.naturalHeight > 0;
+      });
     };
 
     // Проверяем загрузку изображений
     if (checkImagesLoaded()) {
-      startAnimation();
+      // Если все изображения уже загружены (например, из кэша), запускаем анимацию сразу
+      // Но добавляем небольшую задержку для плавности
+      setTimeout(() => {
+        startAnimation();
+      }, 100);
     } else {
       // Ждём загрузки всех изображений
-      const imageLoadPromises = images.map((img, idx) => {
-        if (!img || img.complete) {
+      const imageLoadPromises = imageRefs.current.map((img) => {
+        if (!img) {
           return Promise.resolve();
         }
+        
+        // Если изображение уже загружено (из кэша), проверяем размеры
+        if (img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {
+          return Promise.resolve();
+        }
+        
+        // Если изображение еще не загружено, ждем события load или error
         return new Promise<void>((resolve) => {
-          img.onload = () => resolve();
-          img.onerror = () => resolve(); // Продолжаем даже при ошибке
+          const handleLoad = () => {
+            // Проверяем, что изображение действительно загружено
+            if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+              resolve();
+            } else {
+              // Если размеры не определены, все равно продолжаем (возможно, это SVG или другой формат)
+              resolve();
+            }
+          };
+          
+          const handleError = () => {
+            // Продолжаем даже при ошибке, чтобы анимация не зависла
+            resolve();
+          };
+          
+          // Если изображение уже загружено, но событие уже произошло
+          if (img.complete) {
+            handleLoad();
+            return;
+          }
+          
+          img.addEventListener('load', handleLoad, { once: true });
+          img.addEventListener('error', handleError, { once: true });
+          
           // Таймаут на случай, если изображение не загрузится
-          setTimeout(() => resolve(), 10000);
+          setTimeout(() => {
+            img.removeEventListener('load', handleLoad);
+            img.removeEventListener('error', handleError);
+            resolve();
+          }, 10000);
         });
       });
 
       Promise.all(imageLoadPromises).then(() => {
-        startAnimation();
+        // Небольшая задержка для плавности после загрузки всех изображений
+        setTimeout(() => {
+          startAnimation();
+        }, 100);
       });
     }
 

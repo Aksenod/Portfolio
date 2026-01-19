@@ -87,6 +87,7 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
   
   const [isMounted, setIsMounted] = useState(false);
   const [itemsData, setItemsData] = useState<ItemData[]>([]);
+  const [originalItemsCount, setOriginalItemsCount] = useState(0);
 
   // Загрузка данных: используем initialCases если есть, иначе загружаем из API (для dev режима)
   useEffect(() => {
@@ -97,7 +98,14 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
         img: caseItem.previewImage,
         slug: caseItem.slug,
       }));
-      setItemsData(items);
+      // Дублируем кейсы 3 раза для плотного расположения и бесконечного цикла
+      const DUPLICATION_COUNT = 3;
+      const duplicatedItems: ItemData[] = [];
+      for (let i = 0; i < DUPLICATION_COUNT; i++) {
+        duplicatedItems.push(...items);
+      }
+      setOriginalItemsCount(items.length);
+      setItemsData(duplicatedItems);
     } else {
       // Fallback: загрузка из API (для dev режима)
       const loadCases = async () => {
@@ -111,7 +119,14 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
               img: caseItem.previewImage,
               slug: caseItem.slug,
             }));
-            setItemsData(items);
+            // Дублируем кейсы 3 раза для плотного расположения и бесконечного цикла
+            const DUPLICATION_COUNT = 3;
+            const duplicatedItems: ItemData[] = [];
+            for (let i = 0; i < DUPLICATION_COUNT; i++) {
+              duplicatedItems.push(...items);
+            }
+            setOriginalItemsCount(items.length);
+            setItemsData(duplicatedItems);
           }
         } catch (error) {
           console.error('Error loading cases:', error);
@@ -130,7 +145,7 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
   const updateCenterImage = useCallback(() => {
     const ITEMS_COUNT = itemsData.length;
     const ITEMS_DATA = itemsData;
-    if (!centerImageRef.current || !isMobileDevice() || typeof window === 'undefined') return;
+    if (!centerImageRef.current || !isMobileDevice() || typeof window === 'undefined' || originalItemsCount === 0) return;
 
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
@@ -162,6 +177,9 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
       }
     }
 
+    // Получаем оригинальный индекс для доступа к данным
+    const originalIndex = closestIndex % originalItemsCount;
+
     // Позиционируем центральное изображение в центре экрана
     const centerImage = centerImageRef.current;
     if (centerImage) {
@@ -177,15 +195,15 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
       const centerImage = centerImageRef.current;
       const centerImg = centerImage?.querySelector('img') as HTMLImageElement;
       
-      if (centerImg && ITEMS_DATA[closestIndex]) {
+      if (centerImg && ITEMS_DATA[originalIndex]) {
         // Плавное переключение через opacity
         if (centerImage) {
           centerImage.style.opacity = '0';
           
           setTimeout(() => {
-            if (centerImg && ITEMS_DATA[closestIndex] && centerImage) {
-              centerImg.src = ITEMS_DATA[closestIndex].img.startsWith('/') ? getStaticPath(ITEMS_DATA[closestIndex].img) : ITEMS_DATA[closestIndex].img;
-              centerImg.alt = ITEMS_DATA[closestIndex].text;
+            if (centerImg && ITEMS_DATA[originalIndex] && centerImage) {
+              centerImg.src = ITEMS_DATA[originalIndex].img.startsWith('/') ? getStaticPath(ITEMS_DATA[originalIndex].img) : ITEMS_DATA[originalIndex].img;
+              centerImg.alt = ITEMS_DATA[originalIndex].text;
               centerImage.style.opacity = '1';
             }
           }, 150); // Половина времени анимации для плавности
@@ -194,13 +212,13 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
       
       centerItemIndexRef.current = closestIndex;
     }
-  }, [itemsData]);
+  }, [itemsData, originalItemsCount]);
 
   // Обновление layout с мемоизацией вычислений
   const updateLayout = useCallback(() => {
     const ITEMS_COUNT = itemsData.length;
     const ITEMS_DATA = itemsData;
-    if (!itemsLayerRef.current || !guideCircleRef.current || typeof window === 'undefined') return;
+    if (!itemsLayerRef.current || !guideCircleRef.current || typeof window === 'undefined' || originalItemsCount === 0) return;
 
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
@@ -263,8 +281,13 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
       }
       
       // Позиционируем изображение под текстом (только если оно не в hover состоянии)
+      // Дополнительно проверяем, что изображение не в fixed состоянии
       if (image && currentHoveredIndexRef.current !== i) {
-        image.style.transform = `translate(${x}px, ${y}px) translateY(-50%) rotate(${angle}rad)`;
+        // Проверяем, что изображение действительно в absolute состоянии (не fixed)
+        const isFixed = image.style.position === 'fixed';
+        if (!isFixed) {
+          image.style.transform = `translate(${x}px, ${y}px) translateY(-50%) rotate(${angle}rad)`;
+        }
       }
     }
 
@@ -272,7 +295,7 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
     if (isMobileDevice()) {
       updateCenterImage();
     }
-  }, [updateCenterImage]);
+  }, [updateCenterImage, originalItemsCount]);
 
   // Плавный скролл с easing
   // Easing функция для более естественного движения (cubic ease-out)
@@ -328,6 +351,16 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
     const image = imageElementsRef.current[imageIndex];
     
     if (!image) {
+      if (imageAnimationFrameRef.current !== null) {
+        cancelAnimationFrame(imageAnimationFrameRef.current);
+        imageAnimationFrameRef.current = null;
+      }
+      return;
+    }
+
+    // Проверяем, что изображение действительно в fixed состоянии
+    // Если нет - останавливаем анимацию (изображение вернулось к absolute)
+    if (image.style.position !== 'fixed') {
       if (imageAnimationFrameRef.current !== null) {
         cancelAnimationFrame(imageAnimationFrameRef.current);
         imageAnimationFrameRef.current = null;
@@ -417,29 +450,37 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
     const ITEMS_COUNT = itemsData.length;
     
     ITEMS_DATA.forEach((data, i) => {
+      // Получаем оригинальный индекс для доступа к данным
+      const originalIndex = originalItemsCount > 0 ? i % originalItemsCount : i;
+      const originalData = ITEMS_DATA[originalIndex];
+      
       // Создаем текстовый элемент
       const el = document.createElement('div');
       el.className = 'absolute whitespace-nowrap text-foreground/60 font-medium tracking-[0.12em] uppercase cursor-pointer pointer-events-auto hover:text-foreground transition-colors duration-200 radial-item';
       // Адаптивный размер шрифта: меньше на мобильных
       el.style.fontSize = typeof window !== 'undefined' && window.innerWidth < 768 ? '32px' : '48px';
+      // Применяем шрифт Craftwork Grotesk через CSS переменную
+      el.style.fontFamily = 'var(--font-craftwork), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
       el.style.left = '0';
       el.style.top = '0';
       el.style.transformOrigin = 'left center';
       // Убираем outline и box-shadow при клике/фокусе
       el.style.outline = 'none';
       el.style.boxShadow = 'none';
-      el.textContent = data.text;
+      el.textContent = originalData.text;
       el.setAttribute('role', 'button');
       el.setAttribute('tabIndex', '0');
-      el.setAttribute('aria-label', `${data.text} - нажмите для просмотра`);
+      el.setAttribute('aria-label', `${originalData.text} - нажмите для просмотра`);
       el.setAttribute('data-item-index', i.toString());
       
       // Обработчик для навигации и предотвращения outline при клике
       const clickHandler = (e: Event) => {
         e.preventDefault();
-        // Навигация на страницу кейса
-        if (ITEMS_DATA[i]?.slug) {
-          router.push(`/case/${ITEMS_DATA[i].slug}`);
+        // Навигация на страницу кейса используя оригинальный индекс
+        // Кодируем slug для правильной обработки пробелов и спецсимволов
+        if (originalData?.slug) {
+          const encodedSlug = encodeURIComponent(originalData.slug);
+          router.push(`/case/${encodedSlug}`);
         }
         // Убираем focus после клика, чтобы не было белой рамки
         if (document.activeElement === el) {
@@ -480,10 +521,10 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
         (imageContainer.style as any).webkitClipPath = 'inset(0% 0% 100% 0%)';
         imageContainer.style.transition = 'opacity 0.3s ease-in-out, clip-path 0.5s ease-in-out, -webkit-clip-path 0.5s ease-in-out';
 
-        // Создаем изображение
+        // Создаем изображение используя оригинальные данные
         const img = document.createElement('img');
         // Используем getStaticPath для правильных путей с basePath
-        img.src = data.img.startsWith('/') ? getStaticPath(data.img) : data.img;
+        img.src = originalData.img.startsWith('/') ? getStaticPath(originalData.img) : originalData.img;
         img.style.width = '100%';
         img.style.height = '100%';
         img.style.objectFit = 'cover';
@@ -508,12 +549,12 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
         const mouseEvent = e instanceof MouseEvent ? e : null;
         currentHoveredIndexRef.current = i;
         
-        imageContainer.style.opacity = '1';
-        imageContainer.style.clipPath = 'inset(0% 0% 0% 0%)';
-        (imageContainer.style as any).webkitClipPath = 'inset(0% 0% 0% 0%)';
+        // Полностью отвязываем от радиальной позиции: сбрасываем все transform стили
+        imageContainer.style.transform = 'none';
+        imageContainer.style.transformOrigin = 'center center';
+        
         // Переключаем на fixed позиционирование для следования за курсором
         imageContainer.style.position = 'fixed';
-        imageContainer.style.transformOrigin = 'center center';
         // Добавляем z-index для fixed изображений
         imageContainer.style.zIndex = '1000';
         
@@ -533,6 +574,10 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
           if (hasValidPosition) {
             initialX = mousePositionRef.current.x + offsetX;
             initialY = mousePositionRef.current.y + offsetY;
+          } else {
+            // Если позиции нет, используем центр экрана
+            initialX = window.innerWidth / 2 + offsetX;
+            initialY = window.innerHeight / 2 + offsetY;
           }
         }
         
@@ -541,7 +586,11 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
         imageTargetPositionRef.current = { x: initialX, y: initialY };
         imageContainer.style.left = `${initialX}px`;
         imageContainer.style.top = `${initialY}px`;
-        imageContainer.style.transform = 'none';
+        
+        // Визуальное появление
+        imageContainer.style.opacity = '1';
+        imageContainer.style.clipPath = 'inset(0% 0% 0% 0%)';
+        (imageContainer.style as any).webkitClipPath = 'inset(0% 0% 0% 0%)';
       };
 
       const mouseMoveHandler = (e: Event) => {
@@ -578,6 +627,8 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
             cancelAnimationFrame(imageAnimationFrameRef.current);
             imageAnimationFrameRef.current = null;
           }
+          
+          // Визуальное исчезновение
           imageContainer.style.opacity = '0';
           imageContainer.style.clipPath = 'inset(0% 0% 100% 0%)';
           (imageContainer.style as any).webkitClipPath = 'inset(0% 0% 100% 0%)';
@@ -586,14 +637,15 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
           // Это предотвращает визуальный скачок - изображение исчезает на месте, затем возвращается
           setTimeout(() => {
             // Проверяем, что элемент все еще не в hover состоянии (защита от race condition)
-            if (currentHoveredIndexRef.current !== i) {
+            if (currentHoveredIndexRef.current !== i && imageContainer) {
+              // Полностью сбрасываем fixed стили перед возвратом к absolute
               imageContainer.style.position = 'absolute';
               imageContainer.style.transformOrigin = 'left center';
               imageContainer.style.zIndex = '';
               imageContainer.style.left = '0';
               imageContainer.style.top = '0';
               imageContainer.style.transform = '';
-              // Обновляем позицию через layout
+              // Обновляем позицию через layout (изображение вернется к радиальной позиции)
               updateLayout();
             }
           }, 500); // Время анимации clipPath из transition
@@ -641,9 +693,11 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
             imageContainer.style.clipPath = 'inset(0% 0% 100% 0%)';
             (imageContainer.style as any).webkitClipPath = 'inset(0% 0% 100% 0%)';
             
-            // Навигация на страницу кейса при нажатии Enter
-            if (e.key === 'Enter' && ITEMS_DATA[i]?.slug) {
-              router.push(`/case/${ITEMS_DATA[i].slug}`);
+            // Навигация на страницу кейса при нажатии Enter используя оригинальный индекс
+            // Кодируем slug для правильной обработки пробелов и спецсимволов
+            if (e.key === 'Enter' && originalData?.slug) {
+              const encodedSlug = encodeURIComponent(originalData.slug);
+              router.push(`/case/${encodedSlug}`);
             }
             
             // Задержка возврата к absolute позиции до завершения анимации
@@ -748,7 +802,7 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
         imageAnimationFrameRef.current = null;
       }
     };
-  }, [isMounted, updateLayout, startImageFollowAnimation, itemsData, router]);
+  }, [isMounted, updateLayout, startImageFollowAnimation, itemsData, router, originalItemsCount]);
 
   // Обработка скролла с оптимизацией
   useEffect(() => {
@@ -831,7 +885,7 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
   }
 
   return (
-    <div className="h-screen w-screen text-foreground select-none bg-base overflow-hidden" role="main" aria-label="Радиальная карусель портфолио">
+    <div className="h-screen w-screen text-foreground select-none bg-base overflow-hidden font-sans" role="main" aria-label="Радиальная карусель портфолио">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-6 md:px-10 py-6 pointer-events-none">
         <nav className="flex items-center gap-4 pointer-events-auto" aria-label="Хлебные крошки">
@@ -853,6 +907,13 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
           Scroll to explore
         </div>
       </footer>
+
+      {/* Images Layer - перемещен выше, чтобы не зависеть от скролла радиальной секции */}
+      <div 
+        ref={imagesLayerRef} 
+        className="fixed inset-0 z-10 pointer-events-none"
+        aria-label="Контейнер изображений"
+      />
 
       {/* Radial Section */}
       <section className="relative w-full h-full bg-base overflow-hidden" aria-label="Карусель проектов">
@@ -884,13 +945,6 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
             }}
           />
         </div>
-
-        {/* Images Layer */}
-        <div 
-          ref={imagesLayerRef} 
-          className="absolute inset-0 z-10 pointer-events-none"
-          aria-label="Контейнер изображений"
-        />
 
         {/* Items Layer */}
         <div 

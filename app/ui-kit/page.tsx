@@ -426,7 +426,7 @@ export default function UIKitPage() {
                   </div>
                   <div className="col-span-2 flex flex-col gap-8">
                     <div className="max-w-4xl">
-                      <h1 className="text-foreground text-3xl font-bold leading-[1.1] tracking-tight">
+                      <h1 className="text-foreground text-3xl font-medium leading-[1.1] tracking-tight">
                         Пример заголовка кейса
                       </h1>
                     </div>

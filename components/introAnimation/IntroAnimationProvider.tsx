@@ -19,11 +19,46 @@ export const useIntroAnimation = () => useContext(IntroAnimationContext);
 
 /**
  * Определяет тип навигации страницы
+ * Использует несколько методов для надежного определения типа навигации
  */
 const getNavigationType = (): 'reload' | 'navigate' | 'back_forward' | 'prerender' => {
   if (typeof window === 'undefined') return 'navigate';
-  const navEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-  return navEntry?.type || 'navigate';
+  
+  // Метод 1: Performance Navigation Timing API (предпочтительный)
+  try {
+    const navEntries = performance.getEntriesByType('navigation');
+    if (navEntries.length > 0) {
+      const navEntry = navEntries[0] as PerformanceNavigationTiming;
+      if (navEntry?.type) {
+        return navEntry.type as 'reload' | 'navigate' | 'back_forward' | 'prerender';
+      }
+    }
+  } catch (e) {
+    // Performance API может быть недоступен в некоторых браузерах
+  }
+  
+  // Метод 2: Fallback через performance.navigation (устаревший, но надежный)
+  try {
+    const perfNav = (performance as any).navigation;
+    if (perfNav) {
+      // 1 = TYPE_RELOAD, 2 = TYPE_BACK_FORWARD, 0 = TYPE_NAVIGATE
+      if (perfNav.type === 1) return 'reload';
+      if (perfNav.type === 2) return 'back_forward';
+      return 'navigate';
+    }
+  } catch (e) {
+    // Fallback метод недоступен
+  }
+  
+  // Метод 3: Проверка через sessionStorage и referrer (последний fallback)
+  // Если нет referrer и страница только что загрузилась - это может быть reload
+  // Но это ненадежно, поэтому используем как последний вариант
+  const referrer = document.referrer;
+  const currentUrl = window.location.href;
+  
+  // Если referrer пустой или указывает на ту же страницу - возможно это reload
+  // Но это не точный метод, поэтому возвращаем 'navigate' по умолчанию
+  return 'navigate';
 };
 
 /**
@@ -93,27 +128,41 @@ export function IntroAnimationProvider() {
 
   useEffect(() => {
     // Проверяем только на клиенте после mount
-    const navType = getNavigationType();
-    const referrer = document.referrer;
-    const hasSeenSite = sessionStorage.getItem('intro-animation-shown') === 'true';
-    const show = shouldShowAnimation();
+    // Используем небольшую задержку, чтобы убедиться, что Performance API готов
+    const checkAnimation = () => {
+      const navType = getNavigationType();
+      const referrer = document.referrer;
+      const hasSeenSite = sessionStorage.getItem('intro-animation-shown') === 'true';
+      const show = shouldShowAnimation();
+      
+      // Временное логирование для отладки
+      console.log('[IntroAnimation] Debug:', {
+        navType,
+        pathname: window.location.pathname,
+        referrer,
+        hasSeenSite,
+        shouldShow: show,
+        sessionStorageValue: sessionStorage.getItem('intro-animation-shown')
+      });
+      
+      setShouldShow(show);
+      if (show) {
+        setIsAnimating(true);
+      } else {
+        setAnimationComplete(true);
+      }
+    };
     
-    // Временное логирование для отладки
-    console.log('[IntroAnimation] Debug:', {
-      navType,
-      pathname: window.location.pathname,
-      referrer,
-      hasSeenSite,
-      shouldShow: show,
-      sessionStorageValue: sessionStorage.getItem('intro-animation-shown')
-    });
+    // Проверяем сразу, но также делаем повторную проверку через небольшую задержку
+    // на случай, если Performance API еще не готов
+    checkAnimation();
     
-    setShouldShow(show);
-    if (show) {
-      setIsAnimating(true);
-    } else {
-      setAnimationComplete(true);
-    }
+    // Повторная проверка через 50ms для надежности (если Performance API был не готов)
+    const timeoutId = setTimeout(() => {
+      checkAnimation();
+    }, 50);
+    
+    return () => clearTimeout(timeoutId);
   }, []);
 
   const handleAnimationComplete = () => {

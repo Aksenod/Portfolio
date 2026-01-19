@@ -2,6 +2,7 @@
 
 import { forwardRef } from 'react';
 import Image from 'next/image';
+import { getStaticPath } from '@/lib/utils/paths';
 
 interface CaseHeroProps {
   sectionLabel?: string;
@@ -59,7 +60,7 @@ export const CaseHero = forwardRef<HTMLElement, CaseHeroProps>(
       <div className="col-span-2 flex flex-col items-start justify-start gap-8 md:gap-16 h-auto">
         {/* Заголовок */}
         <div className="max-w-4xl">
-          <h1 className="text-foreground text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold md:font-[900] leading-[1.1] tracking-tight">
+          <h1 className="text-foreground text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold md:font-medium leading-[1.1] tracking-tight">
             {headline}
           </h1>
         </div>
@@ -67,7 +68,7 @@ export const CaseHero = forwardRef<HTMLElement, CaseHeroProps>(
         {/* Изображение */}
         <div className="relative w-full aspect-[4/3] md:aspect-[16/10] overflow-hidden">
           <Image
-            src={image}
+            src={image.startsWith('/') ? getStaticPath(image) : image}
             alt={imageAlt}
             fill
             className="object-cover"
