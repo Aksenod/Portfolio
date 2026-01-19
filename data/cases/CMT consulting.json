@@ -18,12 +18,11 @@
     {
       "title": "Главная страница",
       "images": [
-        "/images/.jpg",
-        ""
+        "/images/image-1768808820041.jpg"
       ]
     }
   ],
-  "published": false,
+  "published": true,
   "createdAt": "2023-11-10T09:15:00.000Z",
-  "updatedAt": "2026-01-19T07:05:57.491Z"
+  "updatedAt": "2026-01-19T07:47:19.558Z"
 }

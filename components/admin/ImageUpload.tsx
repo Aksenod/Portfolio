@@ -94,6 +94,16 @@ export function ImageUpload({
         // API возвращает путь без basePath (например, /images/file.jpg)
         // При отображении будет использоваться getStaticPath для добавления basePath
         const imageUrl = result.data.url;
+        
+        // Проверяем, что URL валидный (не пустой и не только расширение)
+        const invalidPatterns = ['/images/.jpg', '/images/.png', '/images/.webp', '/images/.gif', '/images/.jpeg'];
+        if (!imageUrl || invalidPatterns.includes(imageUrl.toLowerCase())) {
+          setError('Ошибка: не удалось сгенерировать корректное имя файла. Попробуйте переименовать файл перед загрузкой.');
+          console.error('Invalid image URL generated:', imageUrl);
+          setIsUploading(false);
+          return;
+        }
+        
         console.log('Image uploaded successfully:', imageUrl);
         onChange(imageUrl);
         setError(null); // Очищаем ошибки при успехе

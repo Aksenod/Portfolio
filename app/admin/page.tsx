@@ -648,9 +648,9 @@ export default function AdminPage() {
           </div>
         ) : (
           <div className="space-y-4">
-            {cases.map((caseItem) => (
+            {cases.map((caseItem, index) => (
               <div
-                key={`case-${caseItem.id}`}
+                key={`case-${index}-${caseItem.id || caseItem.slug || index}`}
                 className="border border-border-base/20 p-6 rounded bg-base-secondary hover:bg-base-secondary/80 transition-colors"
               >
                 <div className="flex items-start justify-between">

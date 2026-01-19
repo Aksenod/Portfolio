@@ -50,7 +50,9 @@ export async function POST(request: Request) {
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, '');
     
-    const fileName = `${cleanName}${ext}`;
+    // Если после очистки имя стало пустым, генерируем уникальное имя
+    const finalName = cleanName || `image-${Date.now()}`;
+    const fileName = `${finalName}${ext}`;
     const uploadDir = path.join(process.cwd(), 'public', 'images');
 
     // Создаем папку, если её нет
