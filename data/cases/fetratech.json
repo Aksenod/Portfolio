@@ -1,0 +1,27 @@
+{
+  "id": "b7a69fa4-3da0-4ad6-aac3-cdc5394a694a",
+  "slug": "fetratech",
+  "title": "Fetratech",
+  "year": 2023,
+  "techStack": [
+    "Брендинг",
+    "Верстка",
+    "Дизайн"
+  ],
+  "previewImage": "/images/fetra_main.jpg",
+  "heroImage": "/images/fetra_main-1.jpg",
+  "caseType": "Сайты",
+  "screenshotBlocks": [
+    {
+      "title": "Главная страница",
+      "images": [
+        "/images/fetra_1-1.jpg",
+        "/images/fetra_2-1.jpg",
+        "/images/fetra_3.jpg"
+      ]
+    }
+  ],
+  "published": true,
+  "createdAt": "2026-01-12T07:35:35.903Z",
+  "updatedAt": "2026-01-19T07:04:13.998Z"
+}

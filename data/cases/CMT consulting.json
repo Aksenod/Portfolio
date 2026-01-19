@@ -1,0 +1,29 @@
+{
+  "id": "c3d4e5f6-a7b8-9012-cdef-345678901234",
+  "slug": "CMT consulting",
+  "title": "CMT consulting",
+  "year": 2023,
+  "techStack": [
+    "Vue.js",
+    "TypeScript",
+    "D3.js",
+    "Chart.js",
+    "Python",
+    "FastAPI"
+  ],
+  "previewImage": "/images/rectangle-41084.png",
+  "heroImage": "/images/cover.jpg",
+  "caseType": "Dashboard",
+  "screenshotBlocks": [
+    {
+      "title": "Главная страница",
+      "images": [
+        "/images/.jpg",
+        ""
+      ]
+    }
+  ],
+  "published": false,
+  "createdAt": "2023-11-10T09:15:00.000Z",
+  "updatedAt": "2026-01-19T07:05:57.491Z"
+}

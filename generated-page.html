@@ -1,0 +1,790 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codegrid - Radial</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        ::-webkit-scrollbar { display: none; }
+        * { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Preview image container */
+        #preview-container {
+            position: relative;
+        }
+        
+        /* Mask для появления картинки */
+        #appear-mask {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #000;
+            clip-path: inset(0 0 0 0); /* Изначально маска закрывает всю картинку */
+            transition: clip-path 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        #appear-mask.visible {
+            clip-path: inset(0 0 100% 0); /* Маска открывается снизу, показывая картинку */
+        }
+        
+        /* Lightbox styles */
+        #lightbox-overlay {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+        }
+        
+        #lightbox-overlay::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        #lightbox-overlay::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        #lightbox-overlay::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+        
+        #lightbox-overlay::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        #lightbox-content {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+        }
+        
+        #lightbox-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        #lightbox-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        #lightbox-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+        
+        #lightbox-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body class="h-screen w-screen text-white select-none">
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-6 md:px-10 py-6 pointer-events-none">
+        <div class="flex items-center gap-4 pointer-events-auto">
+            <span class="text-base font-medium tracking-tight">Codegrid</span>
+            <span class="text-white/40">/</span>
+            <span class="text-base text-white/60">Radial View</span>
+        </div>
+        <div class="text-base text-white/80 font-medium hidden md:flex items-center gap-2 pointer-events-auto cursor-pointer hover:text-white transition-colors" id="prompt-trigger">
+            <iconify-icon icon="lucide:file-text" width="16" height="16"></iconify-icon>
+            <span>Prompt</span>
+        </div>
+    </header>
+
+    <!-- Footer -->
+    <footer class="fixed bottom-0 left-0 right-0 z-50 flex justify-between items-center px-6 md:px-10 py-6 pointer-events-none">
+        <div class="flex items-center gap-6 text-base text-white/80 pointer-events-auto">
+            <a href="#" class="hover:text-white transition-colors">Subscribe</a>
+            <a href="#" class="hover:text-white transition-colors">Instagram</a>
+        </div>
+        <div class="text-base text-white/80 hidden md:block">
+            Scroll to explore
+        </div>
+    </footer>
+
+    <!-- RADIAL SCROLL COMPONENT SECTION -->
+    <section id="radial-section" class="relative w-full h-full bg-black overflow-hidden">
+        
+        <!-- Visual Circle -->
+        <div id="guide-circle" class="absolute top-1/2 left-0 -translate-y-1/2 rounded-full pointer-events-none z-0 hidden"></div>
+
+        <!-- Preview Image Container -->
+        <div id="preview-container" class="absolute w-[260px] h-[360px] bg-white z-10 pointer-events-none overflow-hidden" style="transform: translate(-50%, -50%); display: none;">
+            <img id="preview-image" src="" alt="Preview" class="w-full h-full object-cover grayscale block">
+            <div id="appear-mask"></div>
+        </div>
+
+        <!-- Items Layer -->
+        <div id="items-layer" class="absolute inset-0 z-20 pointer-events-none"></div>
+
+    </section>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden items-center justify-center p-6 md:p-10">
+        <div class="relative w-full max-w-4xl max-h-[90vh] bg-black border border-white/20 rounded-lg overflow-hidden flex flex-col">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-6 border-b border-white/10">
+                <h2 class="text-lg font-medium text-white">System Task</h2>
+                <div class="flex items-center gap-3">
+                    <!-- Copy Button -->
+                    <button id="copy-button" class="p-2 hover:bg-white/10 rounded transition-colors group" title="Copy to clipboard">
+                        <iconify-icon icon="lucide:copy" width="20" height="20" class="text-white/80 group-hover:text-white transition-colors"></iconify-icon>
+                    </button>
+                    <!-- Close Button -->
+                    <button id="close-lightbox" class="p-2 hover:bg-white/10 rounded transition-colors group">
+                        <iconify-icon icon="lucide:x" width="20" height="20" class="text-white/80 group-hover:text-white transition-colors"></iconify-icon>
+                    </button>
+                </div>
+            </div>
+            <!-- Content -->
+            <div id="lightbox-content" class="flex-1 overflow-y-auto p-6 text-sm text-white/90 leading-relaxed font-mono whitespace-pre-wrap">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        const ITEMS_DATA = [
+            { text: "Alpha Dimension", img: "https://images.unsplash.com/photo-1486718448742-163732cd1544?w=500&q=80" },
+            { text: "Vortex Valley", img: "https://images.unsplash.com/photo-1479839672679-a46483c0e7c8?w=500&q=80" },
+            { text: "Quantum Quarters", img: "https://images.unsplash.com/photo-1449844908441-8829872d2607?w=500&q=80" },
+            { text: "Nebula Nexus", img: "https://images.unsplash.com/photo-1518005052357-e9305505dc3b?w=500&q=80" },
+            { text: "Cosmic Corridor", img: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&q=80" },
+            { text: "Void Vista", img: "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=500&q=80" },
+            { text: "Stellar Station", img: "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?w=500&q=80" },
+            { text: "Lunar Loft", img: "https://images.unsplash.com/photo-1480796927426-f609979314bd?w=500&q=80" },
+            { text: "Solar Spire", img: "https://images.unsplash.com/photo-1518005052357-e9305505dc3b?w=500&q=80" },
+            { text: "Astro Atrium", img: "https://images.unsplash.com/photo-1449844908441-8829872d2607?w=500&q=80" },
+            { text: "Galaxy Garden", img: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&q=80" },
+            { text: "Orbit Oasis", img: "https://images.unsplash.com/photo-1486718448742-163732cd1544?w=500&q=80" },
+            { text: "Meteor Manor", img: "https://images.unsplash.com/photo-1479839672679-a46483c0e7c8?w=500&q=80" },
+            { text: "Comet Court", img: "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=500&q=80" },
+            { text: "Eclipse Estate", img: "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?w=500&q=80" },
+            { text: "Horizon Hall", img: "https://images.unsplash.com/photo-1480796927426-f609979314bd?w=500&q=80" },
+            { text: "Nova Nexus", img: "https://images.unsplash.com/photo-1486718448742-163732cd1544?w=500&q=80" },
+            { text: "Pulsar Plaza", img: "https://images.unsplash.com/photo-1479839672679-a46483c0e7c8?w=500&q=80" },
+            { text: "Quasar Quarters", img: "https://images.unsplash.com/photo-1449844908441-8829872d2607?w=500&q=80" },
+            { text: "Rocket Range", img: "https://images.unsplash.com/photo-1518005052357-e9305505dc3b?w=500&q=80" },
+            { text: "Satellite Station", img: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&q=80" },
+            { text: "Titan Tower", img: "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=500&q=80" },
+            { text: "Uranus Unit", img: "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?w=500&q=80" },
+            { text: "Venus Vista", img: "https://images.unsplash.com/photo-1480796927426-f609979314bd?w=500&q=80" }
+        ];
+
+        const N = ITEMS_DATA.length;
+        const ANGLE_PER_PIXEL = 0.0015;
+        
+        // --- STATE ---
+        let scrollOffset = 0;
+        let targetScrollOffset = 0;
+        let itemElements = [];
+        
+        // Cursor tracking state
+        let cursorX = 0;
+        let cursorY = 0;
+        let isHoveringText = false;
+        
+        // Smooth scroll animation state
+        let scrollAnimationFrameId = null;
+        const SCROLL_SMOOTH_FACTOR = 0.12; // Коэффициент плавности скролла
+        
+        // --- DOM ELEMENTS ---
+        const itemsLayer = document.getElementById('items-layer');
+        const guideCircle = document.getElementById('guide-circle');
+        const previewContainer = document.getElementById('preview-container');
+        const previewImage = document.getElementById('preview-image');
+        const appearMask = document.getElementById('appear-mask');
+        
+        // Обработка ошибок загрузки изображений
+        previewImage.addEventListener('error', () => {
+            // Если изображение не загрузилось, скрываем контейнер
+            if (previewContainer.style.display === 'block') {
+                previewContainer.style.display = 'none';
+                appearMask.classList.remove('visible');
+                isHoveringText = false;
+            }
+        });
+        
+        previewImage.addEventListener('load', () => {
+            // Проверяем, что изображение действительно загрузилось и валидно
+            if (previewImage.complete && previewImage.naturalWidth > 0) {
+                // Изображение успешно загружено - показываем и запускаем анимацию маски
+                if (isHoveringText) {
+                    previewContainer.style.display = 'block';
+                    previewContainer.style.left = `${cursorX || window.innerWidth / 2}px`;
+                    previewContainer.style.top = `${cursorY || window.innerHeight / 2}px`;
+                    appearMask.classList.remove('visible');
+                    void appearMask.offsetWidth; // Force reflow
+                    appearMask.classList.add('visible');
+                }
+            }
+        });
+
+        // --- INITIALIZATION ---
+        function init() {
+            itemsLayer.innerHTML = '';
+            itemElements = [];
+            targetScrollOffset = scrollOffset; // Синхронизируем начальные значения
+
+            ITEMS_DATA.forEach((data, i) => {
+                const el = document.createElement('div');
+                el.className = 'absolute whitespace-nowrap text-white font-medium tracking-[0.12em] uppercase cursor-pointer pointer-events-auto hover:text-white/80 transition-colors duration-200';
+                el.style.fontSize = '48px';
+                el.style.left = '0';
+                el.style.top = '0';
+                el.style.transformOrigin = 'left center';
+                el.textContent = data.text;
+                
+                let hideTimeoutId = null;
+                
+                el.addEventListener('mouseenter', () => {
+                    // Отменяем скрытие, если оно было запланировано
+                    if (hideTimeoutId) {
+                        clearTimeout(hideTimeoutId);
+                        hideTimeoutId = null;
+                    }
+                    
+                    isHoveringText = true;
+                    previewContainer.style.left = `${cursorX || window.innerWidth / 2}px`;
+                    previewContainer.style.top = `${cursorY || window.innerHeight / 2}px`;
+                    
+                    // Устанавливаем источник изображения
+                    previewImage.src = data.img;
+                    
+                    // Функция для запуска анимации маски
+                    const animateMask = () => {
+                        if (isHoveringText) {
+                            appearMask.classList.remove('visible');
+                            void appearMask.offsetWidth; // Force reflow
+                            appearMask.classList.add('visible');
+                        }
+                    };
+                    
+                    // Если картинка уже загружена (из кеша), показываем сразу
+                    if (previewImage.complete && previewImage.naturalWidth > 0) {
+                        previewContainer.style.display = 'block';
+                        animateMask();
+                    } else {
+                        // Если картинка еще загружается, показываем контейнер, а маска запустится при load
+                        previewContainer.style.display = 'block';
+                        // Сбросим маску, чтобы она была закрыта до загрузки
+                        appearMask.classList.remove('visible');
+                    }
+                });
+                
+                el.addEventListener('mouseleave', () => {
+                    isHoveringText = false;
+                    
+                    // Убираем класс visible для маски (запускает анимацию скрытия)
+                    appearMask.classList.remove('visible');
+                    
+                    // Скрываем контейнер после завершения анимации
+                    hideTimeoutId = setTimeout(() => {
+                        if (!isHoveringText) {
+                            previewContainer.style.display = 'none';
+                        }
+                        hideTimeoutId = null;
+                    }, 400); // Длительность анимации
+                });
+
+                itemsLayer.appendChild(el);
+                itemElements.push(el);
+            });
+
+            updateLayout();
+        }
+
+        // --- SMOOTH SCROLL ANIMATION ---
+        function updateSmoothScroll() {
+            // Плавная интерполяция текущего scrollOffset к целевому targetScrollOffset
+            const diff = targetScrollOffset - scrollOffset;
+            
+            // Если разница очень мала, останавливаем анимацию
+            if (Math.abs(diff) < 0.1) {
+                scrollOffset = targetScrollOffset;
+                updateLayout();
+                if (scrollAnimationFrameId) {
+                    cancelAnimationFrame(scrollAnimationFrameId);
+                    scrollAnimationFrameId = null;
+                }
+                return;
+            }
+            
+            // Плавное обновление scrollOffset
+            scrollOffset += diff * SCROLL_SMOOTH_FACTOR;
+            updateLayout();
+            
+            scrollAnimationFrameId = requestAnimationFrame(updateSmoothScroll);
+        }
+        
+        function startSmoothScroll() {
+            if (!scrollAnimationFrameId) {
+                scrollAnimationFrameId = requestAnimationFrame(updateSmoothScroll);
+            }
+        }
+
+        // --- CORE LAYOUT ENGINE ---
+        function updateLayout() {
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            
+            const cx = -viewportWidth * 0.2;
+            const cy = viewportHeight / 2;
+
+            const R = Math.min(viewportWidth, viewportHeight) * 0.508;
+
+            guideCircle.style.width = `${R * 2}px`;
+            guideCircle.style.height = `${R * 2}px`;
+
+            for (let i = 0; i < N; i++) {
+                const item = itemElements[i];
+
+                const baseAngle = (i / N) * 2 * Math.PI;
+                const angle = baseAngle + (scrollOffset * ANGLE_PER_PIXEL);
+
+                // Position on circle edge
+                const x = cx + Math.cos(angle) * R;
+                const y = cy + Math.sin(angle) * R;
+
+                // Rotation follows the radial direction (text points outward)
+                const rotationRad = angle;
+
+                // Transform: position at circle edge, then rotate
+                // Text starts FROM the circle edge and extends outward
+                item.style.transform = `translate(${x}px, ${y}px) translateY(-50%) rotate(${rotationRad}rad)`;
+            }
+        }
+
+        // Отслеживание позиции курсора для позиционирования картинки
+        document.addEventListener('mousemove', (e) => {
+            cursorX = e.clientX;
+            cursorY = e.clientY;
+            
+            // Обновляем позицию картинки только если курсор над текстом
+            if (isHoveringText && previewContainer.style.display === 'block') {
+                previewContainer.style.left = `${cursorX}px`;
+                previewContainer.style.top = `${cursorY}px`;
+            }
+        }, { passive: true });
+        
+        // --- INPUT HANDLING ---
+        window.addEventListener('wheel', (e) => {
+            targetScrollOffset += e.deltaY;
+            startSmoothScroll();
+        }, { passive: true });
+
+        let touchStartY = 0;
+        
+        window.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        window.addEventListener('touchmove', (e) => {
+            const currentY = e.touches[0].clientY;
+            const deltaY = touchStartY - currentY;
+            touchStartY = currentY;
+            targetScrollOffset += deltaY * 2;
+            startSmoothScroll();
+        }, { passive: true });
+
+        window.addEventListener('resize', () => {
+            updateLayout();
+        }, { passive: true });
+
+        document.addEventListener('DOMContentLoaded', init);
+
+        // --- LIGHTBOX FUNCTIONALITY ---
+        const SYSTEM_TASK_TEXT = `# SYSTEM TASK: РЕАЛИЗОВАТЬ ДЕТЕРМИНИРОВАННЫЙ РАДИАЛЬНЫЙ SCROLL-LIST С ЛУЧЕВОЙ ОРИЕНТАЦИЕЙ ТЕКСТА
+
+Данная инструкция описывает **строго детерминированный UI-компонент**.
+**Никакой интерпретации, креатива или «улучшений» не допускается.**
+
+При одинаковых входных данных и размере вьюпорта:
+
+* геометрия
+* положение
+* ориентация текста
+  должны быть **визуально идентичны** во всех реализациях.
+
+---
+
+## 1. КОНТЕКСТ КОМПОНЕНТА
+
+* Название компонента: \`RadialScrollList\`
+* Тип: UI-элемент веб-сайта
+* Среда: HTML + CSS + JavaScript (DOM)
+* Canvas: ❌ запрещён
+* GSAP / анимационные таймлайны: ❌ запрещены
+* Источник движения: **только scroll**
+
+Это **не анимация**,
+не декоративный фон,
+не эксперимент.
+
+---
+
+## 2. КОНТЕЙНЕР И РАЗМЕЩЕНИЕ
+
+### 2.1 Секция
+
+Компонент размещается в отдельной секции:
+
+* width: \`100vw\`
+* height: \`100vh\`
+* position: \`relative\`
+* overflow: \`hidden\`
+* background: \`#000000\`
+
+Внутри секции **нет другого контента**, кроме:
+
+* радиального списка
+* hover-превью изображения
+
+---
+
+### 2.2 Центр окружности (ЖЁСТКО)
+
+Центр всегда фиксирован:
+
+\`\`\`
+cx = section.width / 2
+cy = section.height / 2
+\`\`\`
+
+❌ смещения
+❌ визуального центрирования
+❌ адаптации под контент
+
+---
+
+## 3. ГЕОМЕТРИЯ
+
+### 3.1 Радиус
+
+\`\`\`
+R = min(viewportWidth, viewportHeight) * 0.38
+\`\`\`
+
+---
+
+### 3.2 Визуальная окружность (опционально)
+
+* stroke: \`1px solid rgba(255,255,255,0.35)\`
+* fill: none
+* влияет **только на визуал**, не на расчёты
+
+---
+
+## 4. ЭЛЕМЕНТЫ СПИСКА
+
+* Каждый элемент = текстовая строка
+* Порядок фиксирован
+* Количество: \`N\`
+* У элемента может быть привязан preview-image URL
+
+❌ сортировки
+❌ фильтрации
+❌ динамического изменения порядка
+
+---
+
+## 5. БАЗОВОЕ УГЛОВОЕ РАСПРЕДЕЛЕНИЕ
+
+\`\`\`
+baseAngle(i) = (i / N) * 2π
+\`\`\`
+
+Без:
+
+* easing
+* смещений
+* случайности
+
+---
+
+## 6. SCROLL-МОДЕЛЬ (ЕДИНСТВЕННЫЙ ДВИГАТЕЛЬ)
+
+### 6.1 Вход
+
+* Источник: вертикальный scroll / wheel
+* Накопление в одну переменную:
+
+\`\`\`
+scrollOffset (float, неограничен)
+\`\`\`
+
+---
+
+### 6.2 Связь scroll → угол
+
+\`\`\`
+ANGLE_PER_PIXEL = 0.0015
+angle(i) = baseAngle(i) + scrollOffset * ANGLE_PER_PIXEL
+\`\`\`
+
+Scroll остановился → движение остановилось мгновенно.
+
+❌ инерции
+❌ плавности
+❌ интерполяции
+
+---
+
+## 7. ПОЗИЦИОНИРОВАНИЕ (ИНВАРИАНТ)
+
+Каждый кадр пересчитывается **с нуля**:
+
+\`\`\`
+x(i) = cx + cos(angle(i)) * R
+y(i) = cy + sin(angle(i)) * R
+\`\`\`
+
+❌ накопительное движение
+❌ зависимость от прошлого кадра
+
+---
+
+## 8. ОРИЕНТАЦИЯ ТЕКСТА (КЛЮЧЕВОЕ ОТЛИЧИЕ)
+
+### 8.1 Лучевая модель (REFERENCE-CRITICAL)
+
+Текст **НЕ идёт по касательной**.
+Текст **НЕ следует окружности**.
+
+Текст ведёт себя как **луч**, исходящий из центра.
+
+\`\`\`
+rotation(i) = angle(i)
+\`\`\`
+
+❌ \`+ π / 2\`
+❌ касательная ориентация
+❌ эффект «карусели»
+
+---
+
+### 8.2 Направление чтения
+
+* Начало текста ближе к центру
+* Текст читается **изнутри → наружу**
+* Визуально: как **солнечные лучи**
+
+Любая реализация «вдоль окружности» считается **ошибкой**.
+
+---
+
+## 9. ТИПОГРАФИКА (ФИКСИРОВАНО)
+
+* Font-family: \`Inter\`, fallback \`sans-serif\`
+* Font-weight: \`500\`
+* Font-size: \`14px\`
+* Letter-spacing: \`0.12em\`
+* Text-transform: \`uppercase\`
+* Color: \`#FFFFFF\`
+* White-space: \`nowrap\`
+* Text-align: \`center\`
+
+❌ responsive scaling
+❌ адаптивные размеры
+
+---
+
+## 10. CSS TRANSFORM (СТРОГО)
+
+Каждый элемент:
+
+* \`position: absolute\`
+* позиционируется **только через transform**
+
+Порядок **нельзя менять**:
+
+\`\`\`
+translate(-50%, -50%)
+translate(x(i), y(i))
+rotate(rotation(i))
+\`\`\`
+
+---
+
+## 11. HOVER-ПРЕВЬЮ ИЗОБРАЖЕНИЯ (ОБЯЗАТЕЛЬНО)
+
+### 11.1 Поведение
+
+* Hover на текст → появляется одно изображение
+* Hover out → изображение исчезает сразу
+* Одновременно видно **только одно** изображение
+* Поведение совпадает с референсом
+
+---
+
+### 11.2 Контейнер превью
+
+* position: \`absolute\`
+* центр привязан к \`cx\`, \`cy\`
+* width: \`260px\`
+* height: \`360px\`
+* background: \`#FFFFFF\`
+* overflow: \`hidden\`
+* z-index: \`2\`
+
+Контейнер **не двигается при скролле**.
+
+---
+
+### 11.3 Изображение
+
+* object-fit: \`cover\`
+* grayscale: \`100%\`
+* без рамок
+* без теней
+* без transform
+
+---
+
+### 11.4 Pointer rules
+
+* Text: \`pointer-events: auto\`
+* Image: \`pointer-events: none\`
+* Hover по изображению не блокирует scroll
+
+---
+
+## 12. ЦИКЛ ОБНОВЛЕНИЯ
+
+Существует **одна функция**:
+
+\`\`\`
+updateLayout(scrollOffset)
+\`\`\`
+
+Она:
+
+* пересчитывает все позиции
+* пересчитывает все углы
+
+Hover-логика **не влияет** на геометрию.
+
+---
+
+## 13. СТРОГО ЗАПРЕЩЕНО
+
+❌ CSS transitions
+❌ GSAP \`.to()\` / \`.from()\`
+❌ easing
+❌ inertia
+❌ canvas
+❌ cursor-follow эффекты
+❌ анимация без scroll
+
+---
+
+## 14. КРИТЕРИИ ПРИЁМКИ
+
+Реализация корректна, если:
+
+1. Две реализации дают одинаковую геометрию
+2. Scroll остановился → всё замерло
+3. Центр не смещается
+4. Текст идёт **лучами**, не по кругу
+5. Hover-превью статично и по центру
+6. Визуально совпадает с референсом
+
+---
+
+## 15. КОНТРОЛЬНАЯ ФРАЗА (ДЛЯ AI)
+
+> «Это математически спроецированный радиальный список, центрированный во вьюпорте, управляемый только scroll, с лучевой ориентацией текста из центра наружу и статичным hover-превью в центре.»
+
+Если хоть одно условие нарушено — реализация неверна.`;
+
+        const promptTrigger = document.getElementById('prompt-trigger');
+        const lightboxOverlay = document.getElementById('lightbox-overlay');
+        const lightboxContent = document.getElementById('lightbox-content');
+        const closeLightbox = document.getElementById('close-lightbox');
+        const copyButton = document.getElementById('copy-button');
+
+        // Set content
+        lightboxContent.textContent = SYSTEM_TASK_TEXT;
+
+        // Open lightbox
+        promptTrigger.addEventListener('click', () => {
+            lightboxOverlay.classList.remove('hidden');
+            lightboxOverlay.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        });
+
+        // Close lightbox
+        function closeLightboxHandler() {
+            lightboxOverlay.classList.add('hidden');
+            lightboxOverlay.classList.remove('flex');
+            document.body.style.overflow = '';
+        }
+
+        closeLightbox.addEventListener('click', closeLightboxHandler);
+
+        // Close on overlay click (outside content)
+        lightboxOverlay.addEventListener('click', (e) => {
+            if (e.target === lightboxOverlay) {
+                closeLightboxHandler();
+            }
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !lightboxOverlay.classList.contains('hidden')) {
+                closeLightboxHandler();
+            }
+        });
+
+        // Copy to clipboard
+        copyButton.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(SYSTEM_TASK_TEXT);
+                
+                // Visual feedback
+                const icon = copyButton.querySelector('iconify-icon');
+                const originalIcon = icon.getAttribute('icon');
+                icon.setAttribute('icon', 'lucide:check');
+                copyButton.title = 'Copied!';
+                
+                setTimeout(() => {
+                    icon.setAttribute('icon', originalIcon);
+                    copyButton.title = 'Copy to clipboard';
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy:', err);
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = SYSTEM_TASK_TEXT;
+                textArea.style.position = 'fixed';
+                textArea.style.opacity = '0';
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    const icon = copyButton.querySelector('iconify-icon');
+                    const originalIcon = icon.getAttribute('icon');
+                    icon.setAttribute('icon', 'lucide:check');
+                    copyButton.title = 'Copied!';
+                    setTimeout(() => {
+                        icon.setAttribute('icon', originalIcon);
+                        copyButton.title = 'Copy to clipboard';
+                    }, 2000);
+                } catch (fallbackErr) {
+                    console.error('Fallback copy failed:', fallbackErr);
+                }
+                document.body.removeChild(textArea);
+            }
+        });
+    </script>
+
+</body></html>

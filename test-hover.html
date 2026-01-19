@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Hover Effect</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 50px;
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: white;
+        }
+        
+        .test-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: #111;
+            overflow: hidden;
+        }
+        
+        .test-image {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: #333;
+            border: 2px solid #555;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+            opacity: 0;
+            z-index: 1;
+        }
+        
+        .test-image.active {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.5);
+            z-index: 10;
+        }
+        
+        .test-heading {
+            font-size: 48px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: text-shadow 0.3s ease;
+        }
+        
+        .test-heading:hover {
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+        
+        .status {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <h1>Тест Hover-эффекта</h1>
+    
+    <div class="test-container">
+        <div id="testImage" class="test-image">Hover Image</div>
+    </div>
+    
+    <div class="test-heading" id="heading1" onclick="toggleImage(0)">Line 1</div>
+    <div class="test-heading" id="heading2" onclick="toggleImage(1)">Line 2</div>
+    
+    <div class="status" id="status">Hover на заголовки для тестирования эффекта</div>
+    
+    <script>
+        const testImage = document.getElementById('testImage');
+        const status = document.getElementById('status');
+        let isActive = false;
+        
+        function toggleImage(index) {
+            if (isActive) {
+                testImage.classList.remove('active');
+                isActive = false;
+                status.textContent = `Изображение ${index} скрыто`;
+            } else {
+                testImage.classList.add('active');
+                isActive = true;
+                status.textContent = `Изображение ${index} показано`;
+            }
+        }
+        
+        // Тест hover-эффекта
+        document.getElementById('heading1').addEventListener('mouseenter', () => {
+            testImage.style.background = '#ff4444';
+            toggleImage(0);
+        });
+        
+        document.getElementById('heading1').addEventListener('mouseleave', () => {
+            testImage.classList.remove('active');
+            status.textContent = 'Курсор ушел с Line 1';
+        });
+        
+        document.getElementById('heading2').addEventListener('mouseenter', () => {
+            testImage.style.background = '#4444ff';
+            toggleImage(1);
+        });
+        
+        document.getElementById('heading2').addEventListener('mouseleave', () => {
+            testImage.classList.remove('active');
+            status.textContent = 'Курсор ушел с Line 2';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{
+  "id": "d4e5f6a7-b8c9-0123-def4-456789012345",
+  "slug": "velocity-ecommerce",
+  "title": "Velocity E-Commerce",
+  "year": 2024,
+  "techStack": [
+    "Next.js",
+    "TypeScript",
+    "Stripe",
+    "PostgreSQL",
+    "Prisma",
+    "Tailwind CSS"
+  ],
+  "previewImage": "/images/photo-4.webp",
+  "heroImage": "/images/photo-5.webp",
+  "caseType": "E-Commerce",
+  "screenshotBlocks": [
+    {
+      "title": "Каталог товаров",
+      "images": [
+        "/images/photo-4.webp"
+      ]
+    },
+    {
+      "title": "Страница товара",
+      "images": [
+        "/images/photo-5.webp",
+        "/images/photo-1.webp"
+      ]
+    },
+    {
+      "title": "Корзина и оформление",
+      "images": [
+        "/images/photo-2.webp"
+      ]
+    }
+  ],
+  "published": true,
+  "createdAt": "2024-03-05T16:45:00.000Z",
+  "updatedAt": "2024-03-05T16:45:00.000Z"
+}

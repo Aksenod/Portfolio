@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Fixed Hover Effect</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 50px;
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: white;
+            overflow: hidden;
+        }
+        
+        .test-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: #111;
+        }
+        
+        .test-image {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: #333;
+            border: 2px solid #555;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+            opacity: 0;
+            z-index: 1;
+            clip-path: inset(0% 0% 100% 0%);
+        }
+        
+        .test-image.active {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.5);
+            z-index: 10;
+            clip-path: inset(0% 0% 0% 0%);
+        }
+        
+        .test-heading {
+            font-size: 48px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: text-shadow 0.3s ease;
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            pointer-events: auto;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+        
+        .test-heading:hover {
+            text-shadow: 0 0 40px rgba(255, 255, 255, 0.8);
+        }
+        
+        .status {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            font-size: 14px;
+            color: #888;
+            background: rgba(0,0,0,0.8);
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            background: #333;
+            color: white;
+            border: 1px solid #555;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background: #555;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body>
+    <div class="test-container">
+        <div id="testImage" class="test-image">Hover Image</div>
+        <div class="test-heading" id="heading1">TEST LINE 1</div>
+    </div>
+    
+    <div class="controls">
+        <button onclick="toggleMask()">Toggle Mask</button>
+        <button onclick="toggleImage()">Toggle Image</button>
+    </div>
+    
+    <div class="status" id="status">Status: Ready</div>
+    
+    <script>
+        const testImage = document.getElementById('testImage');
+        const status = document.getElementById('status');
+        let isActive = false;
+        let hasMask = true;
+        
+        function updateStatus(text) {
+            status.textContent = `Status: ${text}`;
+        }
+        
+        function toggleImage() {
+            if (isActive) {
+                testImage.classList.remove('active');
+                isActive = false;
+                updateStatus('Image hidden');
+            } else {
+                testImage.classList.add('active');
+                isActive = true;
+                updateStatus('Image shown');
+            }
+        }
+        
+        function toggleMask() {
+            hasMask = !hasMask;
+            if (hasMask) {
+                testImage.style.clipPath = 'inset(0% 0% 100% 0%)';
+                updateStatus('Mask applied');
+            } else {
+                testImage.style.clipPath = 'inset(0% 0% 0% 0%)';
+                updateStatus('Mask removed');
+            }
+        }
+        
+        // Реализация hover-эффекта с маской (аналогично исправленному коду)
+        document.getElementById('heading1').addEventListener('mouseenter', () => {
+            updateStatus('Mouse enter - showing image with mask animation');
+            testImage.style.background = '#ff4444';
+            
+            // Сначала показываем изображение
+            gsap.to(testImage, {
+                scale: 1.5,
+                opacity: 1,
+                duration: 0.3,
+                ease: 'power2.out',
+                zIndex: 60,
+            });
+            
+            // Затем анимируем маску
+            const maskProgress = { value: 100 };
+            gsap.to(maskProgress, {
+                value: 0,
+                duration: 0.5,
+                ease: 'power2.out',
+                onUpdate: () => {
+                    testImage.style.clipPath = `inset(0% 0% ${maskProgress.value}% 0%)`;
+                },
+            });
+        });
+        
+        document.getElementById('heading1').addEventListener('mouseleave', () => {
+            updateStatus('Mouse leave - hiding image with mask animation');
+            
+            // Сначала анимируем маску
+            const maskProgress = { value: 0 };
+            gsap.to(maskProgress, {
+                value: 100,
+                duration: 0.5,
+                ease: 'power2.out',
+                onUpdate: () => {
+                    testImage.style.clipPath = `inset(0% 0% ${maskProgress.value}% 0%)`;
+                },
+                onComplete: () => {
+                    // Затем скрываем изображение
+                    gsap.to(testImage, {
+                        scale: 1,
+                        opacity: 0,
+                        duration: 0.3,
+                        ease: 'power2.out',
+                        zIndex: 1,
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

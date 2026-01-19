@@ -1,0 +1,43 @@
+{
+  "id": "e5f6a7b8-c9d0-1234-ef56-567890123456",
+  "slug": "zenith-saas",
+  "title": "Zenith SaaS Platform",
+  "year": 2024,
+  "techStack": [
+    "React",
+    "TypeScript",
+    "Node.js",
+    "MongoDB",
+    "AWS",
+    "Docker",
+    "Kubernetes"
+  ],
+  "previewImage": "/images/photo-5.webp",
+  "heroImage": "/images/photo-1.webp",
+  "caseType": "SaaS Platform",
+  "screenshotBlocks": [
+    {
+      "title": "Лендинг и регистрация",
+      "images": [
+        "/images/photo-5.webp",
+        "/images/photo-1.webp"
+      ]
+    },
+    {
+      "title": "Рабочее пространство",
+      "images": [
+        "/images/photo-2.webp",
+        "/images/photo-3.webp"
+      ]
+    },
+    {
+      "title": "Настройки и интеграции",
+      "images": [
+        "/images/photo-4.webp"
+      ]
+    }
+  ],
+  "published": true,
+  "createdAt": "2024-04-12T11:20:00.000Z",
+  "updatedAt": "2024-04-12T11:20:00.000Z"
+}

@@ -1,0 +1,40 @@
+{
+  "id": "b2c3d4e5-f6a7-8901-bcde-f23456789012",
+  "slug": "nexus-mobile",
+  "title": "Тактическая одежда",
+  "year": 2024,
+  "techStack": [
+    "React Native",
+    "TypeScript",
+    "Expo",
+    "Firebase",
+    "Redux"
+  ],
+  "previewImage": "/images/photo-2.webp",
+  "heroImage": "/images/photo-3.webp",
+  "caseType": "Mobile App",
+  "screenshotBlocks": [
+    {
+      "title": "Экран авторизации",
+      "images": [
+        "/images/photo-2.webp",
+        "/images/photo-3.webp"
+      ]
+    },
+    {
+      "title": "Основной интерфейс",
+      "images": [
+        "/images/photo-4.webp"
+      ]
+    },
+    {
+      "title": "Профиль пользователя",
+      "images": [
+        "/images/photo-5.webp"
+      ]
+    }
+  ],
+  "published": true,
+  "createdAt": "2024-02-20T14:30:00.000Z",
+  "updatedAt": "2026-01-19T06:46:59.912Z"
+}
