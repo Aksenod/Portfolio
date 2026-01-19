@@ -23,6 +23,18 @@ export function ImageUpload({
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Проверка валидности пути к изображению
+  const isValidImagePath = (path: string): boolean => {
+    if (!path || !path.trim()) return false;
+    const trimmedPath = path.trim();
+    // Проверяем, что путь начинается с /images/ или является валидным URL
+    // Также разрешаем пути, начинающиеся с /, но только если они не пустые
+    return trimmedPath.startsWith('/images/') || 
+           trimmedPath.startsWith('http://') || 
+           trimmedPath.startsWith('https://') ||
+           (trimmedPath.startsWith('/') && trimmedPath.length > 1);
+  };
+
   // Генерируем URL из имени файла
   const generateUrlFromFileName = (fileName: string): string => {
     // Убираем расширение
@@ -170,7 +182,7 @@ export function ImageUpload({
         />
 
         {/* Превью загруженного изображения */}
-        {value && !isUploading ? (
+        {value && value.trim() && isValidImagePath(value) && !isUploading ? (
           <div className="relative w-full h-full min-h-[200px] p-2">
             <div className="w-full h-full rounded overflow-hidden border border-border-base/20 bg-base-secondary">
               <img
@@ -179,7 +191,8 @@ export function ImageUpload({
                 className="w-full h-full object-contain max-h-[300px] mx-auto"
                 onError={(e) => {
                   // Если изображение не загружается, показываем ошибку через состояние
-                  console.error('Image load error:', value, 'Tried path:', value.startsWith('/') ? getStaticPath(value) : value);
+                  const imagePath = value.startsWith('/') ? getStaticPath(value) : value;
+                  console.error('Image load error:', value, 'Tried path:', imagePath);
                   setError('Изображение не найдено. Проверьте путь к файлу.');
                 }}
                 onLoad={() => {
@@ -218,8 +231,21 @@ export function ImageUpload({
           type="text"
           value={value}
           onChange={(e) => {
-            onChange(e.target.value);
-            setError(null);
+            const newValue = e.target.value;
+            onChange(newValue);
+            // Очищаем ошибку при изменении значения
+            // Но если путь невалидный и не пустой, не показываем ошибку сразу
+            // (ошибка появится только при попытке загрузить изображение)
+            if (!newValue || !newValue.trim() || isValidImagePath(newValue)) {
+              setError(null);
+            }
+          }}
+          onBlur={(e) => {
+            // При потере фокуса проверяем валидность пути, если он заполнен
+            const trimmedValue = e.target.value.trim();
+            if (trimmedValue && !isValidImagePath(trimmedValue)) {
+              setError('Некорректный путь к изображению. Путь должен начинаться с /images/ или быть валидным URL.');
+            }
           }}
           className="w-full bg-base-secondary border border-border-base/20 px-4 py-3 rounded text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-focus-ring/50 focus:border-accent transition-colors"
           placeholder={placeholder}
