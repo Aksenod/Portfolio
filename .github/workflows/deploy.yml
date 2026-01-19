@@ -31,14 +31,36 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Remove API routes for static export
+        run: |
+          rm -rf app/api
+          echo "API routes removed for static export"
+
       - name: Build
         run: npm run build
         env:
           NODE_ENV: production
           ENABLE_STATIC_EXPORT: 'true'
+        continue-on-error: false
+
+      - name: Check if out directory exists
+        run: |
+          if [ ! -d "out" ]; then
+            echo "Error: out directory not found after build"
+            ls -la
+            exit 1
+          fi
+          echo "out directory exists"
+          ls -la out | head -20
 
       - name: Copy .nojekyll to out
-        run: cp .nojekyll out/.nojekyll || echo "" > out/.nojekyll
+        run: |
+          if [ -f ".nojekyll" ]; then
+            cp .nojekyll out/.nojekyll
+          else
+            echo "" > out/.nojekyll
+          fi
+          echo ".nojekyll file created in out directory"
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

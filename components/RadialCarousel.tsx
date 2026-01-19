@@ -391,8 +391,8 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
     // Безопасная очистка изображений перед очисткой itemsLayer
     if (imagesLayerRef.current) {
       try {
-        while (imagesLayerRef.current.firstChild) {
-          const child = imagesLayerRef.current.firstChild;
+        let child: ChildNode | null;
+        while ((child = imagesLayerRef.current.firstChild) !== null) {
           if (child.parentNode === imagesLayerRef.current) {
             imagesLayerRef.current.removeChild(child);
           } else {
@@ -722,8 +722,8 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
       if (imagesLayerRef.current) {
         try {
           // Используем безопасный способ очистки
-          while (imagesLayerRef.current.firstChild) {
-            const child = imagesLayerRef.current.firstChild;
+          let child: ChildNode | null;
+          while ((child = imagesLayerRef.current.firstChild) !== null) {
             if (child.parentNode) {
               imagesLayerRef.current.removeChild(child);
             } else {
