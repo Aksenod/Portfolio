@@ -35,13 +35,7 @@ jobs:
         run: npm run build
         env:
           NODE_ENV: production
-                    ENABLE_STATIC_EXPORT: 'true'
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-              - name: Create .nojekyll
-                      run: touch ./out/.nojekyll
+          ENABLE_STATIC_EXPORT: 'true'
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
