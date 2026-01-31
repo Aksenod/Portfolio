@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { getStaticPath } from '@/lib/utils/paths';
+import { HERO_IMAGE_CONFIG } from '@/components/introAnimation/config';
 
 interface HeroContentProps {
   image: string;
@@ -36,9 +37,25 @@ export function HeroContent({ image, heading, className = '' }: HeroContentProps
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Параметры из анимации для точного соответствия
-  const CONTAINER_WIDTH = 8; // vw
-  const SCALE_CENTER_FINAL = isMobile ? 4.5 : 3; // Финальный масштаб центрального изображения
+  // Используем константы из конфига для точного соответствия анимации
+  const imageConfig = isMobile ? HERO_IMAGE_CONFIG.mobile : HERO_IMAGE_CONFIG.desktop;
+  const CONTAINER_WIDTH = imageConfig.baseWidth;
+  const SCALE_CENTER_FINAL = imageConfig.scale;
+  
+  const imageContainerStyle = {
+    width: `${CONTAINER_WIDTH}vw`,
+    aspectRatio: imageConfig.aspectRatio,
+    left: '50%',
+    top: '50%',
+    transform: `translate(-50%, -50%) scale(${SCALE_CENTER_FINAL})`,
+    transformOrigin: 'center center',
+    willChange: 'transform', // Оптимизация для GPU-ускорения
+  } as const;
+  
+  const imageStyle = {
+    imageRendering: '-webkit-optimize-contrast' as const, // Лучшее качество апскейла
+    willChange: 'transform',
+  } as const;
 
   return (
     <div className={`hero-content absolute inset-0 pointer-events-none ${className}`}>
@@ -50,26 +67,20 @@ export function HeroContent({ image, heading, className = '' }: HeroContentProps
         <div
           className="intro-landing-image-container absolute"
           suppressHydrationWarning
-          style={{
-            width: `${CONTAINER_WIDTH}vw`,
-            aspectRatio: '4/6',
-            left: '50%',
-            top: '50%',
-            transform: `translate(-50%, -50%) scale(${SCALE_CENTER_FINAL})`,
-            transformOrigin: 'center center',
-          }}
+          style={imageContainerStyle}
         >
           <img
             src={image.startsWith('/') ? getStaticPath(image) : image}
             alt={heading.line1}
             className="intro-landing-image w-full h-full object-cover"
+            style={imageStyle}
             loading="eager"
           />
         </div>
       </div>
 
       {/* Заголовок - точно как в IntroLanding */}
-      <div className="intro-landing-heading-wrapper absolute inset-x-0 bottom-0 flex flex-col items-center pb-[10vh] z-40 pointer-events-none">
+      <div className="intro-landing-heading-wrapper absolute inset-x-0 bottom-0 flex flex-col items-center pb-[164px] md:pb-[10vh] z-40 pointer-events-none">
         <div className="intro-landing-heading-line-1 text-white text-5xl md:text-8xl font-bold uppercase tracking-tight mb-2">
           {heading.line1}
         </div>

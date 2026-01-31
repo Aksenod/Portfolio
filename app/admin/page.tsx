@@ -6,7 +6,17 @@ import { ImageUpload } from '@/components/admin/ImageUpload';
 import { getBasePath } from '@/lib/utils/paths';
 import { generateSlug } from '@/lib/utils/slug';
 
-type ViewMode = 'list' | 'create' | 'edit';
+type ViewMode = 'list' | 'create' | 'edit' | 'animation';
+
+interface AnimationConfigData {
+  animationImages: [string, string, string, string, string];
+  heroImage: string;
+  heading: {
+    line1: string;
+    line2: string;
+    line3: string;
+  };
+}
 
 export default function AdminPage() {
   const [cases, setCases] = useState<Case[]>([]);
@@ -31,6 +41,18 @@ export default function AdminPage() {
 
   const [techStackInput, setTechStackInput] = useState('');
   const [loadingAction, setLoadingAction] = useState(false);
+
+  // Конфигурация анимации
+  const [animationConfig, setAnimationConfig] = useState<AnimationConfigData>({
+    animationImages: ['', '', '', '', ''],
+    heroImage: '',
+    heading: {
+      line1: '',
+      line2: '',
+      line3: '',
+    },
+  });
+  const [loadingAnimationConfig, setLoadingAnimationConfig] = useState(false);
 
   // Загрузка кейсов
   useEffect(() => {
@@ -316,6 +338,290 @@ export default function AdminPage() {
     setError(null);
     setSuccess(null);
   };
+
+  // Загрузка конфигурации анимации
+  const loadAnimationConfig = async () => {
+    try {
+      setLoadingAnimationConfig(true);
+      const basePath = getBasePath();
+      const response = await fetch(`${basePath}/api/admin/animation-config`);
+      const result = await response.json();
+      if (result.success && result.data) {
+        setAnimationConfig(result.data);
+      } else if (result.success && !result.data) {
+        // Если конфигурации нет, используем значения по умолчанию из config.ts
+        // Но для админки оставляем пустые значения, чтобы пользователь мог их заполнить
+        setAnimationConfig({
+          animationImages: ['', '', '', '', ''],
+          heroImage: '',
+          heading: {
+            line1: '',
+            line2: '',
+            line3: '',
+          },
+        });
+      } else {
+        setError(result.error || 'Ошибка загрузки конфигурации анимации');
+      }
+    } catch (err) {
+      console.error('Error loading animation config:', err);
+      setError('Ошибка загрузки конфигурации анимации');
+    } finally {
+      setLoadingAnimationConfig(false);
+    }
+  };
+
+  // Сохранение конфигурации анимации
+  const handleSaveAnimationConfig = async () => {
+    setLoadingAction(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      // Валидация
+      if (animationConfig.animationImages.some(img => !img || !img.trim())) {
+        setError('Все изображения для анимации должны быть заполнены');
+        setLoadingAction(false);
+        return;
+      }
+
+      if (!animationConfig.heading.line1 || !animationConfig.heading.line2 || !animationConfig.heading.line3) {
+        setError('Все строки заголовка должны быть заполнены');
+        setLoadingAction(false);
+        return;
+      }
+
+      const basePath = getBasePath();
+      const response = await fetch(`${basePath}/api/admin/animation-config`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(animationConfig),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setSuccess('Конфигурация анимации успешно сохранена');
+        setViewMode('list');
+      } else {
+        setError(result.error || 'Ошибка сохранения конфигурации анимации');
+      }
+    } catch (err) {
+      console.error('Error saving animation config:', err);
+      setError('Ошибка сохранения конфигурации анимации');
+    } finally {
+      setLoadingAction(false);
+    }
+  };
+
+  // Открытие формы управления анимацией
+  const handleOpenAnimationConfig = () => {
+    setError(null);
+    setSuccess(null);
+    setViewMode('animation');
+    loadAnimationConfig();
+  };
+
+  // Форма управления анимацией
+  if (viewMode === 'animation') {
+    return (
+      <main className="min-h-screen bg-base py-12 px-6 md:px-10">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-foreground text-3xl md:text-4xl font-bold tracking-tight mb-2">
+              Управление анимацией
+            </h1>
+            <p className="text-foreground/60 text-base">
+              Настройка изображений для анимации и главного экрана
+            </p>
+          </div>
+
+          {error && (
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded text-foreground">
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 rounded text-foreground">
+              {success}
+            </div>
+          )}
+
+          {loadingAnimationConfig ? (
+            <div className="text-foreground/60 text-center py-12">Загрузка...</div>
+          ) : (
+            <form onSubmit={(e) => { e.preventDefault(); handleSaveAnimationConfig(); }} className="space-y-8">
+              {/* Изображения для анимации */}
+              <div className="space-y-6 border border-border-base/20 p-6 rounded">
+                <h2 className="text-foreground text-xl font-semibold tracking-tight mb-4">
+                  Изображения для анимации (5 шт.)
+                </h2>
+                <p className="text-foreground/60 text-sm mb-4">
+                  Порядок изображений: [-2, -1, 0 (центральное), +1, +2]
+                </p>
+                
+                <div className="space-y-4">
+                  {animationConfig.animationImages.map((image, index) => (
+                    <div key={index}>
+                      <ImageUpload
+                        value={image}
+                        onChange={(url) => {
+                          const newImages = [...animationConfig.animationImages] as [string, string, string, string, string];
+                          newImages[index] = url;
+                          setAnimationConfig({
+                            ...animationConfig,
+                            animationImages: newImages,
+                            // Автоматически обновляем heroImage при изменении центрального изображения (индекс 2)
+                            heroImage: index === 2 ? url : animationConfig.heroImage,
+                          });
+                        }}
+                        label={`Изображение ${index === 2 ? '(центральное)' : index < 2 ? `(${index - 2})` : `(+${index - 2})`}`}
+                        required
+                        placeholder={`/images/photo-${index + 1}.webp`}
+                      />
+                      {index === 2 && (
+                        <p className="mt-2 text-xs text-foreground/60">
+                          Это изображение также используется на главном экране
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Изображение для главного экрана (синхронизировано с центральным) */}
+              <div className="space-y-6 border border-border-base/20 p-6 rounded">
+                <h2 className="text-foreground text-xl font-semibold tracking-tight mb-4">
+                  Изображение для главного экрана
+                </h2>
+                <p className="text-foreground/60 text-sm mb-4">
+                  Автоматически синхронизировано с центральным изображением анимации. 
+                  Можно изменить вручную, если нужно использовать другое изображение.
+                </p>
+                
+                <ImageUpload
+                  value={animationConfig.heroImage}
+                  onChange={(url) => {
+                    setAnimationConfig({
+                      ...animationConfig,
+                      heroImage: url,
+                      // Также обновляем центральное изображение в анимации
+                      animationImages: [
+                        ...animationConfig.animationImages.slice(0, 2),
+                        url,
+                        ...animationConfig.animationImages.slice(3),
+                      ] as [string, string, string, string, string],
+                    });
+                  }}
+                  label="Главное изображение (Hero)"
+                  required
+                  placeholder="/images/photo-3.webp"
+                />
+              </div>
+
+              {/* Заголовок */}
+              <div className="space-y-6 border border-border-base/20 p-6 rounded">
+                <h2 className="text-foreground text-xl font-semibold tracking-tight mb-4">
+                  Заголовок для hero-секции
+                </h2>
+                
+                <div>
+                  <label className="block text-foreground/80 text-sm font-medium mb-2">
+                    Строка 1 *
+                  </label>
+                  <input
+                    type="text"
+                    value={animationConfig.heading.line1}
+                    onChange={(e) =>
+                      setAnimationConfig({
+                        ...animationConfig,
+                        heading: {
+                          ...animationConfig.heading,
+                          line1: e.target.value,
+                        },
+                      })
+                    }
+                    className="w-full bg-base-secondary border border-border-base/20 px-4 py-3 rounded text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-focus-ring/50 focus:border-accent transition-colors"
+                    placeholder="PRODUCT"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-foreground/80 text-sm font-medium mb-2">
+                    Строка 2 *
+                  </label>
+                  <input
+                    type="text"
+                    value={animationConfig.heading.line2}
+                    onChange={(e) =>
+                      setAnimationConfig({
+                        ...animationConfig,
+                        heading: {
+                          ...animationConfig.heading,
+                          line2: e.target.value,
+                        },
+                      })
+                    }
+                    className="w-full bg-base-secondary border border-border-base/20 px-4 py-3 rounded text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-focus-ring/50 focus:border-accent transition-colors"
+                    placeholder="DESIGNER&"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-foreground/80 text-sm font-medium mb-2">
+                    Строка 3 *
+                  </label>
+                  <input
+                    type="text"
+                    value={animationConfig.heading.line3}
+                    onChange={(e) =>
+                      setAnimationConfig({
+                        ...animationConfig,
+                        heading: {
+                          ...animationConfig.heading,
+                          line3: e.target.value,
+                        },
+                      })
+                    }
+                    className="w-full bg-base-secondary border border-border-base/20 px-4 py-3 rounded text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-focus-ring/50 focus:border-accent transition-colors"
+                    placeholder="VIBECODER"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Кнопки */}
+              <div className="flex gap-4">
+                <button
+                  type="submit"
+                  disabled={loadingAction}
+                  className="bg-accent hover:bg-accent-hover text-white font-medium py-3 px-6 rounded focus:outline-none focus:ring-2 focus:ring-focus-ring/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loadingAction ? 'Сохранение...' : 'Сохранить'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setViewMode('list');
+                    setError(null);
+                    setSuccess(null);
+                  }}
+                  className="bg-base-secondary hover:bg-base-secondary/80 border border-border-base/20 text-foreground font-medium py-3 px-6 rounded focus:outline-none focus:ring-2 focus:ring-focus-ring/50 transition-colors"
+                >
+                  Отмена
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+      </main>
+    );
+  }
 
   if (viewMode === 'create' || viewMode === 'edit') {
     return (
@@ -614,12 +920,20 @@ export default function AdminPage() {
               Управление кейсами портфолио
             </p>
           </div>
-          <button
-            onClick={handleCreate}
-            className="bg-accent hover:bg-accent-hover text-white font-medium py-3 px-6 rounded focus:outline-none focus:ring-2 focus:ring-focus-ring/50 transition-colors"
-          >
-            + Создать кейс
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={handleOpenAnimationConfig}
+              className="bg-base-secondary hover:bg-base-secondary/80 border border-border-base/20 text-foreground font-medium py-3 px-6 rounded focus:outline-none focus:ring-2 focus:ring-focus-ring/50 transition-colors"
+            >
+              Управление анимацией
+            </button>
+            <button
+              onClick={handleCreate}
+              className="bg-accent hover:bg-accent-hover text-white font-medium py-3 px-6 rounded focus:outline-none focus:ring-2 focus:ring-focus-ring/50 transition-colors"
+            >
+              + Создать кейс
+            </button>
+          </div>
         </div>
 
         {error && (

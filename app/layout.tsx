@@ -47,7 +47,7 @@ const craftworkGrotesk = localFont({
 // Упрощенный подход: белый квадрат наезжает на экран и уезжает
 const transitionConfig: PageTransitionConfig = {
   direction: 'vertical', // 'horizontal' | 'vertical'
-  duration: 0.8, // Длительность в секундах
+  duration: 0.56, // Длительность в секундах (ускорено на 30%: 0.8 * 0.7 = 0.56)
   ease: 'power2.inOut', // GSAP easing: 'power1', 'power2', 'power3', 'power4', 'expo', 'sine', 'back', 'elastic', 'circ', 'bounce'
   maskColor: '#ffffff', // Цвет маски перехода
 };

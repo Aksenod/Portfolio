@@ -130,3 +130,71 @@ export function findCaseByIdOrSlug(idOrSlug: string): Case | null {
     return null;
   }
 }
+
+/**
+ * Тип конфигурации анимации
+ */
+export interface AnimationConfig {
+  // 5 изображений для анимации в порядке [-2, -1, 0, +1, +2]
+  animationImages: [string, string, string, string, string];
+  // Центральное изображение для главного экрана (то же, что animationImages[2])
+  heroImage: string;
+  // Заголовок для hero-секции
+  heading: {
+    line1: string;
+    line2: string;
+    line3: string;
+  };
+  // Метаданные
+  updatedAt?: string;
+}
+
+/**
+ * Получить путь к файлу конфигурации анимации
+ */
+export function getAnimationConfigFilePath(): string {
+  const dataDir = path.join(process.cwd(), 'data');
+  // Создаем папку если её нет
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+  return path.join(dataDir, 'animation-config.json');
+}
+
+/**
+ * Читает конфигурацию анимации из файла
+ */
+export function readAnimationConfig(): AnimationConfig | null {
+  try {
+    const filePath = getAnimationConfigFilePath();
+    if (!fs.existsSync(filePath)) {
+      return null;
+    }
+    const fileContent = fs.readFileSync(filePath, 'utf-8');
+    return JSON.parse(fileContent) as AnimationConfig;
+  } catch (error) {
+    console.error('Error reading animation config:', error);
+    return null;
+  }
+}
+
+/**
+ * Сохраняет конфигурацию анимации в файл
+ */
+export function writeAnimationConfig(config: AnimationConfig): void {
+  try {
+    const filePath = getAnimationConfigFilePath();
+    const now = new Date().toISOString();
+    const configToSave: AnimationConfig = {
+      ...config,
+      updatedAt: now,
+      // Убеждаемся, что heroImage синхронизирован с центральным изображением
+      heroImage: config.animationImages[2],
+    };
+    const jsonContent = JSON.stringify(configToSave, null, 2);
+    fs.writeFileSync(filePath, jsonContent, 'utf-8');
+  } catch (error) {
+    console.error('Error writing animation config:', error);
+    throw error;
+  }
+}

@@ -130,8 +130,23 @@ export function usePageTransition(options?: UsePageTransitionOptions) {
   
   /**
    * Определяет направление перехода на основе порядка маршрутов
+   * Поддерживает динамические маршруты /case/[slug]
    */
   const determineDirection = useCallback((from: string, to: string): TransitionType => {
+    // Проверяем, является ли путь маршрутом кейса
+    const isCaseRoute = (path: string) => path.startsWith('/case/');
+    
+    // Если переход на страницу кейса - всегда forward
+    if (isCaseRoute(to)) {
+      return 'forward';
+    }
+    
+    // Если переход со страницы кейса - всегда backward
+    if (isCaseRoute(from)) {
+      return 'backward';
+    }
+    
+    // Для остальных маршрутов используем порядок
     const routes = ['/', '/portfolio', '/frame1'];
     const fromIndex = routes.indexOf(from);
     const toIndex = routes.indexOf(to);

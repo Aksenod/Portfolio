@@ -139,6 +139,17 @@ export function Header() {
             UI Kit
           </TransitionLink>
           <TransitionLink
+            href="/contacts"
+            onNavigate={navigate}
+            className={`text-base font-medium pointer-events-auto transition-colors focus:text-foreground focus:outline-none ${
+              pathname === '/contacts' 
+                ? 'text-foreground' 
+                : 'text-foreground/80 hover:text-foreground'
+            }`}
+          >
+            Контакты
+          </TransitionLink>
+          <TransitionLink
             href="/admin"
             onNavigate={navigate}
             className={`text-base font-medium pointer-events-auto transition-colors focus:text-foreground focus:outline-none ${
@@ -210,6 +221,18 @@ export function Header() {
               }`}
             >
               UI Kit
+            </TransitionLink>
+            <TransitionLink
+              href="/contacts"
+              onNavigate={navigate}
+              onClick={handleLinkClick}
+              className={`w-full text-lg font-medium py-6 px-6 rounded transition-colors focus:text-foreground focus:outline-none hover:bg-base ${
+                pathname === '/contacts' 
+                  ? 'text-foreground' 
+                  : 'text-foreground/80 hover:text-foreground'
+              }`}
+            >
+              Контакты
             </TransitionLink>
             <TransitionLink
               href="/admin"

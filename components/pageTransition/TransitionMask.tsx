@@ -24,7 +24,9 @@ export default function TransitionMask({
   onTransitionComplete,
 }: TransitionMaskProps) {
   const maskRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<gsap.core.Timeline | null>(null);
+  const hasPlayedOpeningAnimationRef = useRef(false);
   
   /**
    * Получает начальное положение маски для фазы закрытия
@@ -48,6 +50,13 @@ export default function TransitionMask({
     }
   };
   
+  // Сбрасываем флаг при начале закрытия, чтобы на новой странице анимация могла запуститься
+  useEffect(() => {
+    if (transitionState.phase === 'closing') {
+      hasPlayedOpeningAnimationRef.current = false;
+    }
+  }, [transitionState.phase]);
+  
   // Обработка фазы закрытия
   useEffect(() => {
     if (transitionState.phase !== 'closing' || !maskRef.current) {
@@ -63,11 +72,12 @@ export default function TransitionMask({
     const initialTransform = getClosingInitialTransform(config.direction, transitionState.direction);
     
     // Устанавливаем начальное состояние: маска вне экрана, непрозрачная
+    // Важно: устанавливаем zIndex: 1000 сразу, чтобы избежать моргания
     gsap.set(maskRef.current, {
       transform: initialTransform,
       backgroundColor: config.maskColor,
       opacity: 1,
-      zIndex: -1,
+      zIndex: 1000,
       willChange: 'transform',
     });
     
@@ -76,7 +86,6 @@ export default function TransitionMask({
     
     tl.to(maskRef.current, {
       transform: 'translateX(0) translateY(0)',
-      zIndex: 1000,
       duration: config.duration,
       ease: config.ease,
     });
@@ -86,6 +95,7 @@ export default function TransitionMask({
     // После завершения закрытия вызываем callback
     tl.call(() => {
       // Убираем will-change после завершения анимации для оптимизации
+      // zIndex остается 1000 для фазы открытия
       if (maskRef.current) {
         gsap.set(maskRef.current, {
           willChange: 'auto',
@@ -106,22 +116,38 @@ export default function TransitionMask({
     onCloseComplete,
   ]);
   
-  // Обработка фазы открытия
+  // При монтировании компонента - всегда запускаем анимацию открытия
+  // (template.tsx пересоздается при каждом переходе, так что это надежно)
+  // Обрабатываем как первую загрузку (idle), так и переходы (opening)
   useEffect(() => {
-    if (transitionState.phase !== 'opening' || !maskRef.current) {
-      return;
-    }
+    if (!maskRef.current || !contentRef.current) return;
+    
+    // Если это переход (opening) или первая загрузка (idle без перехода)
+    const shouldPlayOpening = 
+      transitionState.phase === 'opening' || 
+      (transitionState.phase === 'idle' && !transitionState.isTransitioning);
+    
+    if (!shouldPlayOpening) return;
+    
+    // Защита от повторного запуска - если анимация уже запущена, не запускаем снова
+    if (hasPlayedOpeningAnimationRef.current) return;
+    
+    // Отмечаем, что анимация запущена
+    hasPlayedOpeningAnimationRef.current = true;
     
     // Очищаем предыдущую анимацию
     if (animationRef.current) {
       animationRef.current.kill();
     }
     
-    // Маска уже должна покрывать весь экран после фазы закрытия
-    // Определяем конечное положение (вне экрана)
-    const finalTransform = getOpeningFinalTransform(config.direction, transitionState.direction);
+    // Определяем направление: для opening используем из state, для idle - forward
+    const direction = transitionState.phase === 'opening' 
+      ? transitionState.direction 
+      : 'forward';
     
-    // Устанавливаем начальное состояние: маска покрывает весь экран
+    const finalTransform = getOpeningFinalTransform(config.direction, direction);
+    
+    // Убеждаемся, что маска видима и покрывает экран
     gsap.set(maskRef.current, {
       transform: 'translateX(0) translateY(0)',
       backgroundColor: config.maskColor,
@@ -130,25 +156,47 @@ export default function TransitionMask({
       willChange: 'transform',
     });
     
-    // Анимация открытия: маска уезжает за пределы экрана
-    const tl = gsap.timeline();
+    // Контент скрыт
+    gsap.set(contentRef.current, {
+      opacity: 0,
+      visibility: 'hidden',
+      pointerEvents: 'none',
+    });
     
+    // Небольшая задержка для стабильности (предотвращает моргание)
+    const tl = gsap.timeline({ delay: 0.05 });
+    
+    // Маска уезжает
     tl.to(maskRef.current, {
       transform: finalTransform,
       duration: config.duration,
       ease: config.ease,
     });
     
+    // Контент появляется синхронно
+    tl.to(contentRef.current, {
+      opacity: 1,
+      visibility: 'visible',
+      pointerEvents: 'auto',
+      duration: 0.1,
+      ease: 'none',
+    }, 0.05);
+    
     animationRef.current = tl;
     
-    // После завершения открытия скрываем маску и завершаем переход
+    // После завершения
     tl.call(() => {
       if (maskRef.current) {
         gsap.set(maskRef.current, {
           zIndex: -1,
+          willChange: 'auto',
         });
       }
-      onTransitionComplete();
+      
+      // Если это был переход (opening), вызываем callback
+      if (transitionState.phase === 'opening') {
+        onTransitionComplete();
+      }
     });
     
     return () => {
@@ -157,26 +205,16 @@ export default function TransitionMask({
       }
     };
   }, [
-    transitionState.phase,
+    transitionState.phase, 
     transitionState.direction,
+    transitionState.isTransitioning,
     config,
-    onTransitionComplete,
+    onTransitionComplete
   ]);
-  
-  // Сброс маски когда переход не активен
-  useEffect(() => {
-    if (!transitionState.isTransitioning && maskRef.current) {
-      gsap.set(maskRef.current, {
-        transform: 'translateX(0) translateY(0)',
-        opacity: 1,
-        zIndex: -1,
-      });
-    }
-  }, [transitionState.isTransitioning]);
   
   return (
     <>
-      {/* Маска для эффекта перехода */}
+      {/* Маска - видима по умолчанию при загрузке */}
       <div
         ref={maskRef}
         className="fixed inset-0 w-screen h-screen pointer-events-none"
@@ -184,13 +222,21 @@ export default function TransitionMask({
           backgroundColor: config.maskColor,
           transform: 'translateX(0) translateY(0)',
           opacity: 1,
-          zIndex: -1,
+          zIndex: 1000, // Видима по умолчанию
         }}
         aria-hidden="true"
       />
       
-      {/* Контент страницы */}
-      <div className="relative w-full h-full">
+      {/* Контент - скрыт по умолчанию, появится после анимации открытия */}
+      <div 
+        ref={contentRef}
+        className="relative w-full h-full"
+        style={{
+          opacity: 0, // Скрыт по умолчанию
+          visibility: 'hidden',
+          pointerEvents: 'none',
+        }}
+      >
         {children}
       </div>
     </>

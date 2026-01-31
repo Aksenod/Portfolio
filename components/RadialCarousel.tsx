@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import { useTransitionContext } from '@/components/pageTransition';
 import type { Case } from '@/lib/api/types';
 import { getStaticPath } from '@/lib/utils/paths';
 
@@ -64,6 +65,8 @@ interface RadialCarouselProps {
 
 export default function RadialCarousel({ initialCases }: RadialCarouselProps = {}) {
   const router = useRouter();
+  const pathname = usePathname();
+  const { navigate, determineDirection } = useTransitionContext();
   const itemsLayerRef = useRef<HTMLDivElement>(null);
   const guideCircleRef = useRef<HTMLDivElement>(null);
   const imagesLayerRef = useRef<HTMLDivElement>(null);
@@ -476,11 +479,31 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
       // Обработчик для навигации и предотвращения outline при клике
       const clickHandler = (e: Event) => {
         e.preventDefault();
+        
+        // Сразу сбрасываем hover-состояние, чтобы mouseLeaveHandler не запускал анимацию
+        // Это предотвращает двойную анимацию (hover-исчезновение + переход страницы)
+        if (!isMobileDevice() && currentHoveredIndexRef.current === i && imageContainer) {
+          currentHoveredIndexRef.current = null;
+          // Останавливаем анимацию следования
+          if (imageAnimationFrameRef.current !== null) {
+            cancelAnimationFrame(imageAnimationFrameRef.current);
+            imageAnimationFrameRef.current = null;
+          }
+          // Сразу скрываем изображение без анимации
+          imageContainer.style.opacity = '0';
+          imageContainer.style.clipPath = 'inset(0% 0% 100% 0%)';
+          (imageContainer.style as any).webkitClipPath = 'inset(0% 0% 100% 0%)';
+          imageContainer.style.position = 'absolute';
+          imageContainer.style.zIndex = '';
+        }
+        
         // Навигация на страницу кейса используя оригинальный индекс
         // Кодируем slug для правильной обработки пробелов и спецсимволов
         if (originalData?.slug) {
           const encodedSlug = encodeURIComponent(originalData.slug);
-          router.push(`/case/${encodedSlug}`);
+          const targetPath = `/case/${encodedSlug}`;
+          const direction = determineDirection(pathname, targetPath);
+          navigate(targetPath, direction);
         }
         // Убираем focus после клика, чтобы не было белой рамки
         if (document.activeElement === el) {
@@ -697,7 +720,9 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
             // Кодируем slug для правильной обработки пробелов и спецсимволов
             if (e.key === 'Enter' && originalData?.slug) {
               const encodedSlug = encodeURIComponent(originalData.slug);
-              router.push(`/case/${encodedSlug}`);
+              const targetPath = `/case/${encodedSlug}`;
+              const direction = determineDirection(pathname, targetPath);
+              navigate(targetPath, direction);
             }
             
             // Задержка возврата к absolute позиции до завершения анимации
@@ -802,7 +827,7 @@ export default function RadialCarousel({ initialCases }: RadialCarouselProps = {
         imageAnimationFrameRef.current = null;
       }
     };
-  }, [isMounted, updateLayout, startImageFollowAnimation, itemsData, router, originalItemsCount]);
+  }, [isMounted, updateLayout, startImageFollowAnimation, itemsData, navigate, determineDirection, pathname, originalItemsCount]);
 
   // Обработка скролла с оптимизацией
   useEffect(() => {

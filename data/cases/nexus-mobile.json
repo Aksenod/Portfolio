@@ -12,7 +12,7 @@
   ],
   "previewImage": "/images/photo-2.webp",
   "heroImage": "/images/photo-3.webp",
-  "caseType": "Mobile App",
+  "caseType": "Интернет магазин",
   "screenshotBlocks": [
     {
       "title": "Экран авторизации",
@@ -36,5 +36,5 @@
   ],
   "published": true,
   "createdAt": "2024-02-20T14:30:00.000Z",
-  "updatedAt": "2026-01-19T06:46:59.912Z"
+  "updatedAt": "2026-01-19T18:43:31.050Z"
 }

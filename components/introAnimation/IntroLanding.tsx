@@ -4,6 +4,12 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { CustomEase } from 'gsap/CustomEase';
 import { getStaticPath } from '@/lib/utils/paths';
+import { HERO_IMAGE_CONFIG } from './config';
+
+// Регистрируем плагин CustomEase один раз
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(CustomEase);
+}
 
 interface IntroLandingProps {
   images: readonly string[] | string[]; // 5 изображений в порядке [-2, -1, 0, +1, +2]
@@ -60,9 +66,11 @@ export default function IntroLanding({ images, heading, counterText = 'Loading',
     const headingLine3 = headingLine3Ref.current;
 
     const mobileMultiplier = isMobile ? 0.8 : 1;
-    const CONTAINER_WIDTH = 8;
+    // Используем константы размеров из конфига
+    const imageConfig = isMobile ? HERO_IMAGE_CONFIG.mobile : HERO_IMAGE_CONFIG.desktop;
+    const CONTAINER_WIDTH = imageConfig.baseWidth;
     const SCALE_MID = 1.2;
-    const SCALE_CENTER_FINAL = isMobile ? 4.5 : 3;
+    const SCALE_CENTER_FINAL = imageConfig.scale; // Финальный масштаб из конфига
     const D_END = (10 + (CONTAINER_WIDTH * (SCALE_MID - 1))) * mobileMultiplier;
 
     // Устанавливаем контейнер в финальное состояние - полностью скрываем, чтобы не перекрывать header
@@ -242,20 +250,23 @@ export default function IntroLanding({ images, heading, counterText = 'Loading',
     // Mobile multiplier
     const mobileMultiplier = isMobile ? 0.8 : 1;
 
+    // Используем константы размеров из конфига
+    const imageConfig = isMobile ? HERO_IMAGE_CONFIG.mobile : HERO_IMAGE_CONFIG.desktop;
+
     // Начальные значения - равномерное распределение
     // На мобилке: 3 изображения, на десктопе: 5 изображений
     const SIDE_PADDING = 80; // px - отступ от краев экрана
-    const CONTAINER_WIDTH = 8; // vw - ширина контейнера
+    const CONTAINER_WIDTH = imageConfig.baseWidth; // vw - ширина контейнера из конфига
     const SCALE_START = 0.9;
     const SCALE_MID = 1.2; // Увеличение на 20% при схождении
-    const SCALE_CENTER_FINAL = isMobile ? 4.5 : 3;
+    const SCALE_CENTER_FINAL = imageConfig.scale; // Финальный масштаб из конфига
     // Расстояние между центрами: увеличиваем пропорционально scale, чтобы сохранить gap
     // D_END = исходное расстояние + (ширина * (scale - 1))
     const D_END = (10 + (CONTAINER_WIDTH * (SCALE_MID - 1))) * mobileMultiplier; // vw - сохраняем gap при увеличении
 
     // Инициализация состояния
     const initState = () => {
-      // Контейнер: fixed, z-index 10000, pointer-events: none
+      // Контейнер: fixed, z-index 10010 (выше чем Header z-[10001]), pointer-events: none
       gsap.set(container, {
         position: 'fixed',
         top: 0,
@@ -263,7 +274,7 @@ export default function IntroLanding({ images, heading, counterText = 'Loading',
         width: '100vw',
         height: '100vh',
         overflow: 'hidden',
-        zIndex: 10000,
+        zIndex: 10010,
         pointerEvents: 'none',
       });
 
@@ -367,6 +378,10 @@ export default function IntroLanding({ images, heading, counterText = 'Loading',
 
     // Создание timeline
     const tl = gsap.timeline({
+      paused: true, // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: создаем timeline в приостановленном состоянии
+      onStart: () => {
+        // Timeline начался
+      },
       onUpdate: () => {
         // Обновляем counter синхронно с прогрессом timeline
         const progress = (tl.progress() * 100);
@@ -584,6 +599,9 @@ export default function IntroLanding({ images, heading, counterText = 'Loading',
           ease: customEase,
         }, ">"); // После завершения последней строки заголовка
       }
+      
+      // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Запускаем timeline только после добавления всех анимаций
+      tl.play(); // Запускаем timeline после добавления всех анимаций
     };
 
     // Ждём загрузки всех изображений
@@ -694,8 +712,8 @@ export default function IntroLanding({ images, heading, counterText = 'Loading',
               }}
               className="intro-landing-image-container absolute"
               style={{
-                width: '8vw',
-                aspectRatio: '4/6',
+                width: `${isMobile ? HERO_IMAGE_CONFIG.mobile.baseWidth : HERO_IMAGE_CONFIG.desktop.baseWidth}vw`,
+                aspectRatio: isMobile ? HERO_IMAGE_CONFIG.mobile.aspectRatio : HERO_IMAGE_CONFIG.desktop.aspectRatio,
               }}
             >
               <img
@@ -718,7 +736,7 @@ export default function IntroLanding({ images, heading, counterText = 'Loading',
       </div>
 
       {/* Заголовок */}
-      <div className="intro-landing-heading-wrapper absolute inset-x-0 bottom-0 flex flex-col items-center pb-[10vh] z-40 pointer-events-none">
+      <div className="intro-landing-heading-wrapper absolute inset-x-0 bottom-0 flex flex-col items-center pb-[164px] md:pb-[10vh] z-40 pointer-events-none">
         <div
           ref={headingLine1Ref}
           className="intro-landing-heading-line-1 text-white text-5xl md:text-8xl font-bold uppercase tracking-tight mb-2"

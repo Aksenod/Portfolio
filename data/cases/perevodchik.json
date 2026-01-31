@@ -1,0 +1,29 @@
+{
+  "id": "case-1769855037908",
+  "slug": "perevodchik",
+  "title": "Переводчик",
+  "year": 2026,
+  "techStack": [
+    "Cursor"
+  ],
+  "previewImage": "/images/frame-61.webp",
+  "heroImage": "/images/frame-61.webp",
+  "caseType": "Web app",
+  "screenshotBlocks": [
+    {
+      "title": "Вот приложение ",
+      "images": [
+        "/images/1.webp",
+        "/images/2.webp",
+        "/images/3.webp",
+        "/images/4.webp",
+        "/images/5.webp",
+        "/images/6.webp",
+        "/images/7.webp"
+      ]
+    }
+  ],
+  "published": true,
+  "createdAt": "2026-01-31T10:23:57.908Z",
+  "updatedAt": "2026-01-31T10:23:57.908Z"
+}
